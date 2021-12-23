@@ -1,0 +1,48 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#app {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #b6b6b6;
+}
+
+* {
+    user-select: none !important;
+}
+
+#titlebar {
+    -webkit-app-region: drag;
+    margin-top: -20px;
+    min-height: 3.5em;
+}
+
+#content {
+    display: flex;
+    max-height: calc(100vh - 3.5em);
+    align-items: center;
+    justify-content: center;
+}
+
+.left,
+.right {
+    height: 100%;
+    position: relative;
+    flex: 0 0 50%;
+}
+
+#clock {
+    font-size: 5em;
+    margin: 2rem 0;
+}
+
+@media (max-width: 800px) and (min-width: 100px) {
+    .left, .right {
+
+    }
+}
