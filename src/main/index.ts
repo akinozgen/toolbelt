@@ -2,8 +2,6 @@ import os from 'os'
 import path from 'path'
 import {app, BrowserWindow} from 'electron'
 
-const ElectronAcrylicWindow = require('electron-acrylic-window');
-
 const isWin7 = os.release().startsWith('6.1')
 if (isWin7) app.disableHardwareAcceleration()
 
@@ -22,15 +20,20 @@ async function bootstrap() {
         autoHideMenuBar: true,
         titleBarStyle: 'hidden',
         frame: false,
-        alwaysOnTop: true,
+        // alwaysOnTop: true,
         titleBarOverlay: false,
+        vibrancy: 'dark',
     })
 
-    ElectronAcrylicWindow.setVibrancy(win, {
-        theme: 'dark',
-        effect: 'acrylic',
-        maximumRefreshRate: 30
-    });
+    if (process.platform !== 'darwin') {
+        const ElectronAcrylicWindow = require('electron-acrylic-window');
+        
+        ElectronAcrylicWindow.setVibrancy(win, {
+            theme: 'dark',
+            effect: 'acrylic',
+            maximumRefreshRate: 30
+        });
+    }
 
     if (app.isPackaged) {
         win.loadFile(path.join(__dirname, '../renderer/index.html'))

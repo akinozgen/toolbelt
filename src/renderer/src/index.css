@@ -4,6 +4,10 @@ body {
     padding: 0;
 }
 
+:root {
+    --sidebar-item-bg: rgba(0, 0, 0, 0.197);
+}
+
 #app {
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -20,29 +24,96 @@ body {
     -webkit-app-region: drag;
     margin-top: -20px;
     min-height: 3.5em;
+    box-sizing: border-box !important;
 }
 
-#content {
+.container {
+    width: 100%;
     display: flex;
-    max-height: calc(100vh - 3.5em);
-    align-items: center;
-    justify-content: center;
+    text-align: left;
 }
 
-.left,
-.right {
-    height: 100%;
+.container .sidebar {
+    flex: 3;
+}
+
+.container .content {
+    flex: 9;
+}
+
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    color: azure;
+    padding-right: 1em;
+}
+
+.sidebar ul a {
+    padding: 0.5rem 1rem;
+    display: block;
+    text-decoration: none;
+    color: azure;
+    cursor: default;
+    transition: background .15s ease-in-out;
+}
+
+.sidebar ul a.active {
+    background-color: var(--sidebar-item-bg);
+}
+
+.sidebar ul a:hover, .sidebar ul a:focus {
+    background-color: var(--sidebar-item-bg);
+}
+
+.page-title {
+    text-align: center;
+}
+
+.md5-label {
+    text-align: center;
+    display: block;
+}
+
+.md5-label:not(:last-child) {
+    margin-bottom: 4rem;
+}
+
+.md5-text-encrypted, .md5-text-plain {
+    font-size: 1.2rem;
+}
+
+.md5-label input {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    text-align: center;
+    background-color: transparent;
+    border: none;
+    color: white;
+    min-width: 50vw;
+    background-color: var(--sidebar-item-bg);
+}
+
+.copy-value {
+    clear: both;
     position: relative;
-    flex: 0 0 50%;
+    display: inline-block;
 }
 
-#clock {
-    font-size: 5em;
-    margin: 2rem 0;
+.copy-value .copy-target {
+    display: block;
+    position: absolute;
+    width: 1.5rem;
+    height: 1.5rem;
+    right: 10px;
+    top: calc(50% - 4px);
+    cursor: pointer;
+} 
+
+.copy-value .copy-target img {
+    width: 100%;
+    height: 100%;
 }
 
 @media (max-width: 800px) and (min-width: 100px) {
-    .left, .right {
-
-    }
 }
