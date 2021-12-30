@@ -5,8 +5,8 @@ body {
 }
 
 :root {
-    --sidebar-bg: rgba(0, 0, 0, 0.197);
-    --sidebar-item-bg: rgba(0, 0, 0, 0.308);
+    --sidebar-bg: rgba(0, 0, 0, 0.39);
+    --sidebar-item-bg: rgba(132, 132, 132, 0.24);
 }
 
 #app {
@@ -36,6 +36,12 @@ body {
 
 .container .sidebar {
     flex: 3;
+    background-color: var(--sidebar-bg);
+    margin-top: -40px;
+    padding-top: 40px;
+    height: 100vh;
+    box-sizing: border-box;
+    box-shadow: 0 2px 5px 1px black;
 }
 
 .container .content {
@@ -47,7 +53,6 @@ body {
     padding: 0;
     margin: 0;
     color: azure;
-    padding-right: 1em;
 }
 
 .sidebar ul a {
@@ -57,13 +62,11 @@ body {
     color: azure;
     cursor: default;
     transition: background .15s ease-in-out;
+    margin: 0.5rem 1rem;
+    border-radius: 5px;
 }
 
-.sidebar ul a.active {
-    background-color: var(--sidebar-item-bg);
-}
-
-.sidebar ul a:hover, .sidebar ul a:focus {
+.sidebar ul a.active, .sidebar ul a:focus {
     background-color: var(--sidebar-item-bg);
 }
 
