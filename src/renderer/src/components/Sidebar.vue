@@ -27,8 +27,6 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const currentRoute = computed(() => {
-    console.log(router.currentRoute.value);
-    
     return router.currentRoute.value.fullPath;
 });
 </script>

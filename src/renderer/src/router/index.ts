@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import Home from '../pages/Home.vue';
 import MD5 from '../pages/MD5.vue';
+import Camera from '../pages/Camera.vue';
 
 const routes = [
 
@@ -14,6 +15,12 @@ const routes = [
         path: '/md5',
         name: 'MD5 Encrypter',
         component: MD5
+    },
+
+    {
+        path: '/camera',
+        name: 'CameraCheck',
+        component: Camera
     }
 
 ];
