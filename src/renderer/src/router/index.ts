@@ -9,7 +9,7 @@ const routes = [
 
     {
         path: '/',
-        name: 'Home',
+        name: 'Home Page / Settings',
         component: Home
     },
 
@@ -21,13 +21,13 @@ const routes = [
 
     {
         path: '/camera',
-        name: 'CameraCheck',
+        name: 'Camera Check',
         component: Camera
     },
 
     {
         path: '/mic',
-        name: 'Mic. Check',
+        name: 'Microphone Check',
         component: Mic
     },
 

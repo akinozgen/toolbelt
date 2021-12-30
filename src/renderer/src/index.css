@@ -295,6 +295,27 @@ body {
   background-color: rgb(151, 27, 23);
 }
 
+.settings label {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  flex-wrap: wrap;
+}
+
+.settings label .label-text {
+  margin-right: 2rem;
+  font-size: 1.5rem;
+}
+
+.settings label .input * {
+  font-size: 1.5rem;
+  background-color: var(--sidebar-item-bg);
+  color: var(--sidebar-bg);
+  border: none;
+  padding: 0.4rem 1rem;
+  border-radius: 5px;
+}
+
 @media (max-width: 799px) and (min-width: 100px) {
     .container .content {
         flex: 0 0 calc(100% - 1rem);

@@ -21,8 +21,7 @@ async function bootstrap() {
         titleBarStyle: 'hidden',
         frame: false,
         minWidth: 400,
-        minHeight: 500,
-        alwaysOnTop: true,
+        minHeight: 640,
         titleBarOverlay: false,
         vibrancy: 'dark',
     })
