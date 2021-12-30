@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory } from 'vue-router';
 import Home from '../pages/Home.vue';
 import MD5 from '../pages/MD5.vue';
 import Camera from '../pages/Camera.vue';
+import Mic from '../pages/Mic.vue';
 
 const routes = [
 
@@ -21,6 +22,12 @@ const routes = [
         path: '/camera',
         name: 'CameraCheck',
         component: Camera
+    },
+
+    {
+        path: '/mic',
+        name: 'Mic. Check',
+        component: Mic
     }
 
 ];
