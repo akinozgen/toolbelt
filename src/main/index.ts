@@ -20,6 +20,8 @@ async function bootstrap() {
         autoHideMenuBar: true,
         titleBarStyle: 'hidden',
         frame: false,
+        minWidth: 400,
+        minHeight: 500,
         // alwaysOnTop: true,
         titleBarOverlay: false,
         vibrancy: 'dark',

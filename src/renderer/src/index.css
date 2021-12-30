@@ -70,6 +70,10 @@ body {
     background-color: var(--sidebar-item-bg);
 }
 
+.container .sidebar ul a .icon {
+    display: none;
+}
+
 .page-title {
     text-align: center;
 }
@@ -162,5 +166,25 @@ body {
     overflow: hidden;
 }
 
-@media (max-width: 800px) and (min-width: 100px) {
+@media (max-width: 799px) and (min-width: 100px) {
+    .container .content {
+        flex: 0 0 calc(100%);
+    }
+
+    .container .sidebar {
+        flex: 0 0 100%;
+        overflow: hidden;
+        transition: all .3s ease;
+        margin-right: -99vw;
+        transform: translateX(-98vw);
+    }
+
+    .container .sidebar:hover {
+        transform: translateX(-95vw);
+    }
+
+    .container .sidebar.opened {
+        margin-right: 0;
+        transform: none;
+    }
 }
