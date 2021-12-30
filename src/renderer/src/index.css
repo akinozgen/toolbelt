@@ -21,6 +21,10 @@ body {
     user-select: none !important;
 }
 
+::-webkit-scrollbar {
+  display: none;
+}
+
 #titlebar {
     -webkit-app-region: drag;
     margin-top: -20px;
@@ -47,6 +51,7 @@ body {
 .container .content {
     flex: 9;
     padding: 0 1rem;
+    box-sizing: border-box;
 }
 
 .sidebar ul {
@@ -167,9 +172,132 @@ body {
     overflow: hidden;
 }
 
+.timer .clock {
+  text-align: center;
+  font-size: 4rem;
+  font-family: monospace;
+  font-weight: bold;
+}
+
+.timer .selects {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+
+  margin-top: 4rem;
+}
+
+.timer .selects select {
+  min-width: 4rem;
+  height: 10rem;
+  text-align: center;
+  font-size: 2rem;
+  color: white;
+  background-color: transparent;
+  border: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.timer .selects .select {
+  position: relative;
+  z-index: 2;
+}
+
+.timer .selects .select:before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  background: linear-gradient(var(--sidebar-bg), transparent, var(--sidebar-bg));
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  right: 0;
+  border-radius: 7px;
+}
+
+.timer .button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.timer .button button {
+  border: 0;
+  background-color: var(--sidebar-item-bg);
+  text-align: center;
+  font-size: 1.5rem;
+  width: 100%;
+  margin: 0 2.5rem;
+  border-radius: 5px;
+  color: white;
+  padding: 0.5rem;
+  transition: all .15s ease-in-out;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(0, 0, 0, 0.322);
+}
+
+.timer .button button:active, .timer .button button.active {
+  background-color: var(--sidebar-bg);
+}
+
+.timer .notice {
+  text-align: center;
+  color: white;
+  font-size: 1.2rem;
+}
+
+.timer .radios {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.timer .radios label {
+  display: inline-block;
+  background-color: var(--sidebar-item-bg);
+  padding: .5rem .75rem;
+  font-size: 1.2rem;
+  border-radius: 5px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(0, 0, 0, 0.5);
+}
+
+.timer .radios label input {
+  -webkit-appearance: none;
+  width: 1.3rem;
+  height: 1.3rem;
+  border-radius: 100px;
+  border: 3px solid var(--sidebar-bg);
+  position: relative;
+}
+
+.timer .radios label input:checked::after {
+  content: '';
+  display: block;
+  position: absolute;
+  background-color: var(--sidebar-bg);
+  width: 80%;
+  height: 80%;
+  border-radius: 10px;
+  top: 11%;
+  left: 10.5%;
+}
+
+.timer .radios label:first-child {
+  margin-right: 2rem;
+}
+
+.timer .button .stop-alarm {
+  background-color: rgb(151, 27, 23);
+}
+
 @media (max-width: 799px) and (min-width: 100px) {
     .container .content {
-        flex: 0 0 calc(100%);
+        flex: 0 0 calc(100% - 1rem);
     }
 
     .container .sidebar {

@@ -3,6 +3,7 @@ import Home from '../pages/Home.vue';
 import MD5 from '../pages/MD5.vue';
 import Camera from '../pages/Camera.vue';
 import Mic from '../pages/Mic.vue';
+import Timer from '../pages/Timer.vue';
 
 const routes = [
 
@@ -28,6 +29,12 @@ const routes = [
         path: '/mic',
         name: 'Mic. Check',
         component: Mic
+    },
+
+    {
+        path: '/timer',
+        name: 'Timer',
+        component: Timer
     }
 
 ];

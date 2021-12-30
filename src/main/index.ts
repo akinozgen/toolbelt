@@ -22,7 +22,7 @@ async function bootstrap() {
         frame: false,
         minWidth: 400,
         minHeight: 500,
-        // alwaysOnTop: true,
+        alwaysOnTop: true,
         titleBarOverlay: false,
         vibrancy: 'dark',
     })
