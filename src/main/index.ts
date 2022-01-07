@@ -26,21 +26,10 @@ async function bootstrap() {
         vibrancy: 'dark',
     })
 
-    if (process.platform !== 'darwin') {
-        const ElectronAcrylicWindow = require('electron-acrylic-window');
-        
-        ElectronAcrylicWindow.setVibrancy(win, {
-            theme: 'dark',
-            effect: 'acrylic',
-            maximumRefreshRate: 30
-        });
-    }
-
     if (app.isPackaged) {
         win.loadFile(path.join(__dirname, '../renderer/index.html'))
     } else {
-        const pkg = await import('../../package.json')
-        const url = `http://${pkg.env.HOST || '127.0.0.1'}:${pkg.env.PORT}`
+        const url = `http://127.0.0.1:8000`;
 
         win.loadURL(url)
         // win.maximize()

@@ -39,8 +39,7 @@ const routes = [
 
 ];
 
-const pkg = await import('../../../../package.json');
-const url = `http://${pkg.env.HOST || '127.0.0.1'}:${pkg.env.PORT}`
+const url = `http://127.0.0.1:8000`
 
 const router = createRouter({
     history: createWebHashHistory(url),
