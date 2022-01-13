@@ -1,8 +1,8 @@
 {
-  "name": "electron-vue-vite",
+  "name": "toolbelt",
   "version": "0.0.1",
   "main": "dist/main/index.cjs",
-  "author": "草鞋没号 <308487730@qq.com>",
+  "author": "Akin Ozgen <akinozgen17@outlook.com>",
   "license": "MIT",
   "scripts": {
     "dev": "node scripts/watch.mjs",

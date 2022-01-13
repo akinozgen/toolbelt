@@ -15,6 +15,7 @@ After all, this application will be a platform where I collect my tools just lik
 For now, there is an alarm clock tool, a tool to check if the webcam and microphone are working, and finally the MD5 encoder.
 
 Coming soon includes:
+
 - a markdown notebook ('MDpad' in the pictures)
 - screenshot tool (image and video)
 - steam, epic and xbox game launchers
@@ -26,15 +27,13 @@ Coming soon includes:
 
 ...and hell, maybe a good music player will be awesome
 
-
 #### Why electronjs?
 
 Because i have a windows laptop, a linux laptop and a macbook in the office :)
 
 [Screenshots can be found here](https://github.com/akinozgen/timer/tree/main/screenshots)
 
-I'm soooo open to help in this project, and i will try to make this appealing to everyone in need. 
-
+I'm soooo open to help in this project, and i will try to make this appealing to everyone in need.
 
 ### Development
 
@@ -43,5 +42,6 @@ Simply clone the repo and install dependencies with yarn or npm
 To run development mode
 `yarn dev` or `npm run dev`
 
-
 _thanks to @caoxiemeihao for this great vite+vue+electron template_
+
+<a href="https://www.flaticon.com/free-icons/motor" title="motor icons">Motor icons created by Freepik - Flaticon</a>

@@ -1,5 +1,5 @@
 {
-  "appId": "308487730@qq.com",
+  "appId": "com.akinozgen.toolbelt",
   "asar": true,
   "directories": {
     "output": "release/${version}"
@@ -11,11 +11,13 @@
   ],
   "mac": {
     "artifactName": "${productName}_${version}.${ext}",
+    "icon": "appicons/mac/icon.icns",
     "target": [
       "dmg"
     ]
   },
   "win": {
+    "icon": "appicons/win/icon.ico",
     "target": [
       {
         "target": "nsis",
