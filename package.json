@@ -12,6 +12,7 @@
     "node": ">=16.0.0"
   },
   "dependencies": {
+    "choices.js": "^10.0.0",
     "clipboard": "^2.0.8",
     "ts-md5": "^1.2.10",
     "vue": "^3.2.22",
