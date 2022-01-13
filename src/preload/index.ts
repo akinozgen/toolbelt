@@ -21,3 +21,4 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
         return ipcRenderer.on(...args)
     }
 })
+contextBridge.exposeInMainWorld('platform', process.platform);
