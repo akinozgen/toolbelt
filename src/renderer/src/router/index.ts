@@ -4,6 +4,7 @@ import MD5 from '../pages/MD5.vue';
 import Camera from '../pages/Camera.vue';
 import Mic from '../pages/Mic.vue';
 import Timer from '../pages/Timer.vue';
+import MDPad from '../pages/MDPad.vue';
 
 const routes = [
 
@@ -17,6 +18,12 @@ const routes = [
         path: '/md5',
         name: 'MD5 Encrypter',
         component: MD5
+    },
+
+    {
+        path: '/mdpad',
+        name: 'Markdown Notepad',
+        component: MDPad
     },
 
     {
