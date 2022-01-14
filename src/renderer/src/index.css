@@ -85,6 +85,19 @@ body {
   transition: background 0.15s ease-in-out;
   margin: 0.5rem 1rem;
   border-radius: 5px;
+  position: relative;
+}
+
+.sidebar ul a hr {
+  position: absolute;
+  right: -10%;
+  left: -10%;
+  opacity: 0.05;
+  top: 100%;
+}
+
+.sidebar ul a.divider {
+  margin-bottom: 20px;
 }
 
 .sidebar ul a.active,
@@ -400,4 +413,71 @@ body {
 
 .choices[data-type*='select-one'] .choices__input {
   color: #b6b6b6;
+}
+
+/** Game Grid */
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(100, 1fr);
+  grid-column-gap: 1em;
+  grid-row-gap: 1em;
+  height: 100vh;
+  overflow: auto;
+}
+
+.game-grid .game {
+  overflow: hidden;
+  position: relative;
+  height: max-content;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.game-grid .game a {
+  display: block;
+}
+
+.game-grid .game::after {
+  content: '';
+  background-color: rgba(0, 0, 0, 0);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  transition: all 0.2s ease-in-out;
+}
+
+.game-grid .game .game-title {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+}
+
+.game-grid .game .game-title {
+  transform: translateY(-200%);
+  transition: all 0.25s ease-in-out;
+  width: 100%;
+  text-align: center;
+  color: #b6b6b6;
+}
+
+.game-grid .game img {
+  width: 100%;
+  transition: all 0.35s ease-in-out;
+}
+
+.game-grid .game:hover::after {
+  background-color: rgba(0, 0, 0, 0.671);
+}
+
+.game-grid .game:hover .game-title {
+  transform: translateY(0);
+}
+
+.game-grid .game:hover img {
+  transform: scale(1.1) translateY(0%) translateX(3%);
 }

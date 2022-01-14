@@ -71,6 +71,11 @@
     lodash "^4.17.15"
     tmp-promise "^3.0.2"
 
+"@node-steam/vdf@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@node-steam/vdf/-/vdf-2.2.0.tgz#94335f7e5c130a80ba4f16cf38239eca755c57db"
+  integrity sha512-YCfIPsIpyrtOP5AdsarjPqjTElVFrXJlWedWNzjCaIeam06v9ebYgApRAcw9b93awNDboTEiHFMnCvlJJHqKcA==
+
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.14.0.tgz#9fb3a3cf3132328151f353de4632e01e52102bea"
@@ -380,6 +385,13 @@ at-least-node@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/at-least-node/-/at-least-node-1.0.0.tgz#602cd4b46e844ad4effc92a8011a3c46e0238dc2"
   integrity sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==
+
+axios@^0.24.0:
+  version "0.24.0"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.24.0.tgz#804e6fa1e4b9c5288501dd9dff56a7a0940d20d6"
+  integrity sha512-Q6cWsys88HoPgAaFAVUb0WpPk0O8iTeisR9IMqy9G8AbO4NlpVknrnQS03zzF9PGAWgO3cgletO3VjV/P7VztA==
+  dependencies:
+    follow-redirects "^1.14.4"
 
 balanced-match@^1.0.0:
   version "1.0.2"
@@ -1097,6 +1109,11 @@ filelist@^1.0.1:
   dependencies:
     minimatch "^3.0.4"
 
+follow-redirects@^1.14.4:
+  version "1.14.7"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.7.tgz#2004c02eb9436eee9a21446a6477debf17e81685"
+  integrity sha512-+hbxoLbFMbRKDwohX8GkTataGqO6Jb7jGwpAlwgy2bIz25XtRm7KEzJM76R1WiNT5SwZkX4Y75SwBolkpmE7iQ==
+
 form-data@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/form-data/-/form-data-4.0.0.tgz#93919daeaf361ee529584b9b31664dc12c9fa452"
@@ -1158,6 +1175,14 @@ get-caller-file@^2.0.5:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/get-caller-file/-/get-caller-file-2.0.5.tgz#4f94412a82db32f36e3b0b9741f8a97feb031f7e"
   integrity sha512-DyFP3BM/3YHTQOCUL/w0OZHR0lpKeGrxotcHWcqNEdnltqFwXVfhEBQ94eIo34AfQpo0rGki4cyIiftY06h2Fg==
+
+get-installed-steam-apps@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/get-installed-steam-apps/-/get-installed-steam-apps-0.1.1.tgz#618b8e6f61581efed5a675f232c7429e6358e101"
+  integrity sha512-+SJ4hvm7pOQbxfA4z7Y6AUAKr4YEXp3t2vqpx5NEjSTFTKCOKRZ1/O4uHFJprNUNf42k8rBchIm2qIhckctzYQ==
+  dependencies:
+    "@node-steam/vdf" "^2.2.0"
+    axios "^0.24.0"
 
 get-stream@^4.1.0:
   version "4.1.0"

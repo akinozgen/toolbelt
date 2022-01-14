@@ -1,20 +1,20 @@
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
+import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import Sidebar from './components/Sidebar.vue';
 
 const { platform } = window;
 const router = useRouter();
-const sidebarClass = ref("");
+const sidebarClass = ref('');
 
 function sidebarClick() {
-  if (sidebarClass.value === "opened") sidebarClass.value = "";
-  else sidebarClass.value = "opened";
+  if (sidebarClass.value === 'opened') sidebarClass.value = '';
+  else sidebarClass.value = 'opened';
 }
 
 onMounted(async () => {
-  let startPage = localStorage.getItem("startPage") || "/";
-  if (startPage != "/") {
+  let startPage = localStorage.getItem('startPage') || '/';
+  if (startPage != '/') {
     router.push(startPage);
   }
 });

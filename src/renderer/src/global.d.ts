@@ -1,11 +1,14 @@
-export {}
+import { ILibraryFolders } from 'get-installed-steam-apps/interfaces';
+
+export {};
 
 declare global {
-    interface Window {
-        // Expose some Api through preload script
-        fs: typeof import('fs')
-        ipcRenderer: import('electron').IpcRenderer
-        platform: string
-        removeLoading: () => void
-    }
+  interface Window {
+    // Expose some Api through preload script
+    fs: typeof import('fs');
+    ipcRenderer: import('electron').IpcRenderer;
+    platform: string;
+    steamLibrary: () => Promise<ILibraryFolders>;
+    removeLoading: () => void;
+  }
 }
