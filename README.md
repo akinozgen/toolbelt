@@ -1,4 +1,4 @@
-### Timer (not just a timer. I'm too lazy to change the repo name)
+### Toolbelt
 
 #### What is it?
 
@@ -18,7 +18,7 @@ Coming soon includes:
 
 - a markdown notebook ('MDpad' in the pictures)
 - screenshot tool (image and video)
-- steam, epic and xbox game launchers
+- ~~steam~~, epic and xbox game launchers
 - android virtual devices launcher
 - project creator and launcher
 - browser bookmarks panel (maybe)
