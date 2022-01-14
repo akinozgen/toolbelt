@@ -1,6 +1,6 @@
 {
   "name": "toolbelt",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "dist/main/index.cjs",
   "author": "Akin Ozgen <akinozgen17@outlook.com>",
   "license": "MIT",
