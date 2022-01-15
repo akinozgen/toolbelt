@@ -19,7 +19,7 @@ Coming soon includes:
 - a markdown notebook ('MDpad' in the pictures)
 - screenshot tool (image and video)
 - ~~steam~~, epic and xbox game launchers
-- android virtual devices launcher
+- ~~android virtual devices launcher~~
 - project creator and launcher
 - browser bookmarks panel (maybe)
 - ssh public/private key switcher
