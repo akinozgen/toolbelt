@@ -7,6 +7,7 @@ import Timer from '../pages/Timer.vue';
 import MDPad from '../pages/MDPad.vue';
 import Android from '../pages/Android.vue';
 import GameLauncher from '../pages/GameLauncher.vue';
+import SSHLaunch from '../pages/SSHLaunch.vue';
 
 const routes = [
   {
@@ -37,6 +38,12 @@ const routes = [
     path: '/android',
     name: 'AVDs',
     component: Android
+  },
+
+  {
+    path: '/ssh_launch',
+    name: 'SSH Launcher',
+    component: SSHLaunch
   },
 
   {
