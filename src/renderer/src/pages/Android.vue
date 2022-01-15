@@ -18,52 +18,6 @@
           <button @click="avdRun(avd.name)">Run</button>
         </div>
       </div>
-      <div class="avd-list-item" v-for="avd in avds" :key="avd.name">
-        <div class="left">
-          <img
-            v-if="avd.screenshotPath"
-            :src="`data:image/png;base64,${avd.screenshotPath.replace(/\\/g, '/')}`"
-            :alt="avd.name"
-          />
-          <img :src="androidIcon" :alt="avd.name" v-else />
-        </div>
-        <div class="right">
-          <h3>{{ avd.name }}</h3>
-          <p>{{ avd.target }}</p>
-
-          <button>Run</button>
-        </div>
-      </div>
-      <div class="avd-list-item" v-for="avd in avds" :key="avd.name">
-        <div class="left">
-          <img
-            v-if="avd.screenshotPath"
-            :src="`data:image/png;base64,${avd.screenshotPath.replace(/\\/g, '/')}`"
-            :alt="avd.name"
-          />
-          <img :src="androidIcon" :alt="avd.name" v-else />
-        </div>
-        <div class="right">
-          <h3>{{ avd.name }}</h3>
-          <p>{{ avd.target }}</p>
-
-          <button>Run</button>
-        </div>
-      </div>
-      <div class="avd-list-item" v-for="avd in avds" :key="avd.name">
-        <div class="left">
-          <img
-            v-if="avd.screenshotPath"
-            :src="`data:image/png;base64,${avd.screenshotPath.replace(/\\/g, '/')}`"
-            :alt="avd.name"
-          />
-          <img :src="androidIcon" :alt="avd.name" v-else />
-        </div>
-        <div class="right">
-          <h3>{{ avd.name }}</h3>
-          <p>{{ avd.target }}</p>
-        </div>
-      </div>
     </section>
   </div>
 </template>
