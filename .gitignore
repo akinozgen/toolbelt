@@ -8,3 +8,6 @@ tmp
 **/.tmp
 release
 .vscode
+.idea
+
+!.i-dont-know-what-am-i-doing-with-my-life
