@@ -3,6 +3,7 @@ import { contextBridge, ipcRenderer, IpcRenderer } from 'electron';
 import { domReady } from './utils';
 import { useLoading } from './loading';
 import loadSteamApps, { mapLibraryToGameInfo } from 'get-installed-steam-apps';
+import getAndroidAVDS, { IAVD } from '../main/src/getAndroidAVDS';
 
 const isDev = process.env.NODE_ENV === 'development';
 const { removeLoading, appendLoading } = useLoading();
@@ -26,4 +27,7 @@ contextBridge.exposeInMainWorld('platform', process.platform);
 contextBridge.exposeInMainWorld('steamLibrary', async function () {
   const steamLibrary = loadSteamApps();
   return await mapLibraryToGameInfo(steamLibrary);
+});
+contextBridge.exposeInMainWorld('androidVirtualDevices', function (): IAVD[] {
+  return getAndroidAVDS();
 });

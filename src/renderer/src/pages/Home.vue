@@ -5,11 +5,7 @@
       <label>
         <div class="label-text">Start page</div>
         <div class="select">
-          <select
-            v-model="startPage"
-            @change="changeStartPage"
-            ref="selector"
-          ></select>
+          <select v-model="startPage" @change="changeStartPage" ref="selector"></select>
         </div>
       </label>
     </div>
@@ -27,7 +23,7 @@ const router = useRouter();
 const routes = computed(() => router.getRoutes());
 const startPage = ref(localStorage.getItem('startPage') || '/');
 
-function changeStartPage(e: any) {
+function changeStartPage(e: any): void {
   startPage.value = e.target.value;
   localStorage.setItem('startPage', startPage.value);
 }

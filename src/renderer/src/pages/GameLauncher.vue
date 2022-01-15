@@ -1,11 +1,13 @@
 <template>
-  <h1 class="page-title">Game Launcher</h1>
-  <div class="game-grid">
-    <div class="game" v-for="game in gameLibrary" :key="game.steam_appid">
-      <a :href="`steam://run/${game.steam_appid}`">
-        <h3 class="game-title">{{ game.name }}</h3>
-        <img :src="game.header_image" :alt="game.name" class="game-poster" />
-      </a>
+  <div class="page-full-height-scrollable">
+    <h1 class="page-title left">Steam Apps</h1>
+    <div class="game-grid">
+      <div class="game" v-for="game in gameLibrary" :key="game.steam_appid">
+        <a :href="`steam://run/${game.steam_appid}`">
+          <h3 class="game-title">{{ game.name }}</h3>
+          <img :src="game.header_image" :alt="game.name" class="game-poster" />
+        </a>
+      </div>
     </div>
   </div>
 </template>

@@ -1,7 +1,7 @@
 import os from 'os';
 import path from 'path';
 import { app, BrowserWindow, session, ipcMain } from 'electron';
-import { exec, execSync } from 'child_process';
+import { startAvd } from './src/getAndroidAVDS';
 
 const isWin7 = os.release().startsWith('6.1');
 if (isWin7) app.disableHardwareAcceleration();
@@ -24,8 +24,11 @@ async function bootstrap() {
     minWidth: 400,
     minHeight: 640,
     titleBarOverlay: false,
-    vibrancy: 'dark'
+    vibrancy: 'dark',
+    width: 815
   });
+
+  win.setMenu(null);
 
   if (app.isPackaged) {
     win.loadFile(path.join(__dirname, '../renderer/index.html'));
@@ -42,26 +45,18 @@ app.on('ready', function (e) {
   const filter = {
     urls: ['*://*.steampowered.com/*']
   };
-  session.defaultSession.webRequest.onBeforeSendHeaders(
-    filter,
-    (details, callback) => {
-      details.requestHeaders['Origin'] = 'http://example.com/*';
-      callback({ requestHeaders: details.requestHeaders });
-    }
-  );
+  session.defaultSession.webRequest.onBeforeSendHeaders(filter, (details, callback) => {
+    details.requestHeaders['Origin'] = 'http://example.com/*';
+    callback({ requestHeaders: details.requestHeaders });
+  });
 
-  session.defaultSession.webRequest.onHeadersReceived(
-    filter,
-    (details, callback) => {
-      if (!details?.responseHeaders) {
-        details.responseHeaders = {};
-      }
-      details.responseHeaders['access-control-allow-origin'] = [
-        'http://127.0.0.1:8000'
-      ];
-      callback({ responseHeaders: details.responseHeaders });
+  session.defaultSession.webRequest.onHeadersReceived(filter, (details, callback) => {
+    if (!details?.responseHeaders) {
+      details.responseHeaders = {};
     }
-  );
+    details.responseHeaders['access-control-allow-origin'] = ['http://127.0.0.1:8000'];
+    callback({ responseHeaders: details.responseHeaders });
+  });
 });
 
 app.whenReady().then(bootstrap);
@@ -79,4 +74,8 @@ app.on('second-instance', () => {
     if (win.isMinimized()) win.restore();
     win.focus();
   }
+});
+
+ipcMain.on('start_avd', function (e, avdName) {
+  startAvd(avdName);
 });

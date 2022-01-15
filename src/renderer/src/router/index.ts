@@ -5,6 +5,7 @@ import Camera from '../pages/Camera.vue';
 import Mic from '../pages/Mic.vue';
 import Timer from '../pages/Timer.vue';
 import MDPad from '../pages/MDPad.vue';
+import Android from '../pages/Android.vue';
 import GameLauncher from '../pages/GameLauncher.vue';
 
 const routes = [
@@ -30,6 +31,12 @@ const routes = [
     path: '/mdpad',
     name: 'MD Notepad',
     component: MDPad
+  },
+
+  {
+    path: '/android',
+    name: 'AVDs',
+    component: Android
   },
 
   {

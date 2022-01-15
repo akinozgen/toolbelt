@@ -45,3 +45,4 @@ To run development mode
 _thanks to @caoxiemeihao for this great vite+vue+electron template_
 
 <a href="https://www.flaticon.com/free-icons/motor" title="motor icons">Motor icons created by Freepik - Flaticon</a>
+<a href="https://www.flaticon.com/free-icons/android" title="android icons">Android icons created by Freepik - Flaticon</a>

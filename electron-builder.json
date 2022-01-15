@@ -28,6 +28,11 @@
     ],
     "artifactName": "${productName}_${version}.${ext}"
   },
+  "linux": {
+    "icon": "appicons/png/256x256.png",
+    "target": "Appimage",
+    "maintainer": "Akın Özgen <akinozgen17@outlook.com>"
+  },
   "nsis": {
     "oneClick": false,
     "perMachine": false,
