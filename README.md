@@ -36,6 +36,7 @@ I'm soooo open to help in this project, and i will try to make this appealing to
 
 ### Todo
 - [ ] Ditch my stupid localstorage implementation and use vuex@next with persistence.
+- [ ] Use sqlite database for persistence. 
 - [ ] Create settings for `ANDROID_HOME`, `ANDROID_AVD_HOME` and `STEAM_INSTALL_DIR` 
 - [ ] Make left menu scrollable.
 - [ ] Make left menu elements pinnable. Show pinned elements fixed at bottom.
@@ -45,7 +46,7 @@ I'm soooo open to help in this project, and i will try to make this appealing to
 
 #### Maybe i'll do them later
 - [ ] Use [daisyui](https://daisyui.com/) for ui.
-- [ ] Make a audio visualizer in microphone check page.
+- [ ] Make an audio visualizer in microphone check page.
 - [ ] Open, save, load markdown notes from local file system.
 - [ ] Export, import settings.
 - [ ] Google-keep like postit note taking.
