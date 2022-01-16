@@ -28,6 +28,16 @@ async function bootstrap() {
     width: 815
   });
 
+  if (process.platform === 'win32') {
+    const ElectronAcrylicWindow = require('electron-acrylic-window');
+
+    ElectronAcrylicWindow.setVibrancy(win, {
+      theme: 'dark',
+      effect: 'acrylic',
+      maximumRefreshRate: 60
+    });
+  }
+
   win.setMenu(null);
 
   if (app.isPackaged) {
@@ -36,7 +46,6 @@ async function bootstrap() {
     const url = `http://127.0.0.1:8000`;
 
     win.loadURL(url);
-    // win.maximize()
     win.webContents.openDevTools();
   }
 }
