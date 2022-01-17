@@ -28,16 +28,6 @@ async function bootstrap() {
     width: 815
   });
 
-  if (process.platform === 'win32') {
-    const ElectronAcrylicWindow = require('electron-acrylic-window');
-
-    ElectronAcrylicWindow.setVibrancy(win, {
-      theme: 'dark',
-      effect: 'acrylic',
-      maximumRefreshRate: 60
-    });
-  }
-
   win.setMenu(null);
 
   if (app.isPackaged) {
