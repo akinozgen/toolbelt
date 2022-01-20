@@ -1,6 +1,6 @@
 <template>
   <section class="p-10">
-    <h1 class="text-left">App Settings</h1>
+    <h1 class="text-left">Home Page / App Settings</h1>
     <div class="pt-5">
       <div class="form-control">
         <label class="label">

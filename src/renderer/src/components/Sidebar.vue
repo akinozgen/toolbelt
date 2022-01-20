@@ -3,8 +3,7 @@
     <li v-for="route in router.getRoutes()" :key="route.path">
       <router-link
         :class="{
-          active: currentRoute == route.path,
-          divider: route.props.default?.divider
+          active: currentRoute == route.path
         }"
         :to="route.path"
       >
