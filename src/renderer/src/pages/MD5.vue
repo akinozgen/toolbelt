@@ -1,19 +1,24 @@
 <template>
-    <section class="tool">
-        <h1 class="page-title">
-            MD5 Encrypter
-        </h1>
-        <label class="md5-label">
-            String to Hash <br>
-            <input type="text" class="input-text md5-text-plain" autofocus v-model="inputText">
-        </label>
-        <label class="md5-label">
-            Hashed String <br>
-            <copy :text-to-copy="encryptedText">
-                <input type="text" readonly class="input-readonly md5-text-encrypted" v-model="encryptedText">
-            </copy>
-        </label>
-    </section>
+  <section class="p-10">
+    <h1 class="text-left">MD5 Encrypter</h1>
+    <div class="form-control pt-2">
+      <label class="label"> String to Hash </label>
+      <input type="text" class="input input-bordered text-center" autofocus v-model="inputText" />
+    </div>
+
+    <div class="form-control pt-5">
+      <label class="label"> <label class="label"> Hashed String </label> </label>
+
+      <copy :text-to-copy="encryptedText">
+        <input
+          class="w-full input input-primary input-bordered text-center"
+          type="text"
+          readonly
+          v-model="encryptedText"
+        />
+      </copy>
+    </div>
+  </section>
 </template>
 
 <script lang="ts" setup>
@@ -22,5 +27,7 @@ import { Md5 } from 'ts-md5/dist/md5';
 import Copy from '../components/Copy.vue';
 
 const inputText = ref('');
-const encryptedText = computed<String>(() => inputText.value.length ? Md5.hashStr(inputText.value) : '');
+const encryptedText = computed<String>(() =>
+  inputText.value.length ? Md5.hashStr(inputText.value) : ''
+);
 </script>

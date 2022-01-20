@@ -26,7 +26,6 @@
       <div class="relative">
         <input
           type="text"
-          placeholder="Search"
           readonly
           class="w-full pr-16 input input-primary input-bordered"
           v-model="steamDir"
@@ -49,7 +48,6 @@
         <div class="relative">
           <input
             type="text"
-            placeholder="Search"
             readonly
             class="w-full pr-16 input input-primary input-bordered"
             v-model="androidHome"
@@ -70,7 +68,6 @@
         <div class="relative">
           <input
             type="text"
-            placeholder="Search"
             readonly
             class="w-full pr-16 input input-primary input-bordered"
             v-model="avdHome"
