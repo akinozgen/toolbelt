@@ -1,21 +1,24 @@
 <template>
-  <h1 class="page-title left">Android Virtual Devices</h1>
-  <div class="page-full-height-scrollable">
-    <section class="avd-list">
-      <div class="avd-list-item" v-for="avd in avds" :key="avd.name">
-        <div class="left">
+  <div class="p-10">
+    <h1 class="text-left pb-5">Android Virtual Devices</h1>
+    <section class="grid grid-cols-2 gap-4">
+      <div class="flex text-left" v-for="avd in avds" :key="avd.name">
+        <div class="flex-1">
           <img
             v-if="avd.screenshotPath"
+            class="rounded-lg"
             :src="`data:image/png;base64,${avd.screenshotPath.replace(/\\/g, '/')}`"
             :alt="avd.name"
           />
           <img :src="androidIcon" :alt="avd.name" v-else />
         </div>
-        <div class="right">
-          <h3>{{ avd.name }}</h3>
+        <div class="flex-1 ml-2 flex flex-col h-full">
+          <h1>{{ avd.name }}</h1>
           <p>{{ avd.target }}</p>
 
-          <button @click="avdRun(avd.name)">Run</button>
+          <div class="flex flex-col">
+            <button @click="avdRun(avd.name)" class="btn btn-primary btn-block">Run</button>
+          </div>
         </div>
       </div>
     </section>
