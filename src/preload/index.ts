@@ -1,9 +1,10 @@
 import fs from 'fs';
-import { contextBridge, ipcRenderer, IpcRenderer } from 'electron';
+import { contextBridge, ipcMain, ipcRenderer, IpcRenderer } from 'electron';
 import { domReady } from './utils';
 import { useLoading } from './loading';
 import loadSteamApps, { mapLibraryToGameInfo } from 'get-installed-steam-apps';
 import getAndroidAVDS, { IAVD } from '../main/src/getAndroidAVDS';
+import * as path from 'path';
 
 const isDev = process.env.NODE_ENV === 'development';
 const { removeLoading, appendLoading } = useLoading();

@@ -1,5 +1,5 @@
 <template>
-  <ul>
+  <ul class="menu w-64 menu-compact lg:menu-normal">
     <li v-for="route in router.getRoutes()" :key="route.path">
       <router-link
         :class="{

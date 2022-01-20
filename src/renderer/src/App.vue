@@ -22,12 +22,19 @@ onMounted(async () => {
 
 <template>
   <div id="titlebar"></div>
-  <div class="container" :class="platform === 'darwin' ? 'vibrant' : ''">
-    <div class="sidebar" @click="sidebarClick()" :class="sidebarClass">
+  <div class="container flex flex-row min-h-screen" :class="platform === 'darwin' ? 'vibrant' : ''">
+    <aside
+      @click="sidebarClick()"
+      :class="{
+        opened: sidebarClass == 'opened',
+        'bg-opacity-10 text-white': platform === 'darwin'
+      }"
+      class="sidebar pt-10 w-64 md:shadow bg-primary fixed h-full"
+    >
       <Sidebar />
-    </div>
-    <div class="content">
+    </aside>
+    <main class="main pt-10 flex flex-col flex-grow ml-64">
       <router-view />
-    </div>
+    </main>
   </div>
 </template>

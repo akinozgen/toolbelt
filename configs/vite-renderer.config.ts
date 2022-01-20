@@ -1,7 +1,8 @@
-import { join } from 'path'
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import pkg from '../package.json'
+import { join } from 'path';
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import pkg from '../package.json';
+import '../src/renderer/src/index.css';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -11,10 +12,10 @@ export default defineConfig({
   base: './',
   build: {
     emptyOutDir: true,
-    outDir: '../../dist/renderer',
+    outDir: '../../dist/renderer'
   },
   server: {
     host: pkg.env.HOST,
-    port: pkg.env.PORT,
-  },
-})
+    port: pkg.env.PORT
+  }
+});

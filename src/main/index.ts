@@ -1,6 +1,6 @@
 import os from 'os';
 import path from 'path';
-import { app, BrowserWindow, session, ipcMain } from 'electron';
+import electron, { app, BrowserWindow, session, ipcMain, ipcRenderer } from 'electron';
 import { startAvd } from './src/getAndroidAVDS';
 
 const isWin7 = os.release().startsWith('6.1');
@@ -77,4 +77,31 @@ app.on('second-instance', () => {
 
 ipcMain.on('start_avd', function (e, avdName) {
   startAvd(avdName);
+});
+
+ipcMain.on('open_dir_select_android_home', function (e) {
+  const select = electron.dialog.showOpenDialogSync({
+    title: 'Please Select Android SDK Home',
+    properties: ['openDirectory']
+  });
+
+  win?.webContents.send('dir_selected_android_home', select);
+});
+
+ipcMain.on('open_dir_select_avd_home', function (e) {
+  const select = electron.dialog.showOpenDialogSync({
+    title: 'Please Select AVD Home',
+    properties: ['openDirectory']
+  });
+
+  win?.webContents.send('dir_selected_avd_home', select);
+});
+
+ipcMain.on('open_dir_select_steam_dir', function (e) {
+  const select = electron.dialog.showOpenDialogSync({
+    title: 'Please Select Steam Installation Directory',
+    properties: ['openDirectory']
+  });
+
+  win?.webContents.send('dir_selected_steam', select);
 });
