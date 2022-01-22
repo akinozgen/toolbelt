@@ -54,7 +54,8 @@ I'm soooo open to help in this project, and i will try to make this appealing to
 - [ ] Two factor authentication generator. export, import etc.
 - [ ] Custom iframe link for left menu item. Selectable icon, name, pinnable.
 - [ ] Repl for configured languages, Eg. Selectable compiler and compilation options.
-- [ ] Spotify controller (will put api key in settings.)
+- [ ] Spotify currently playing and devices. (will put api key in settings.)
+- [ ] Spotify playback controller.
  
 ### Development
 
