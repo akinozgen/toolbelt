@@ -1,6 +1,6 @@
 import os from 'os';
 import path from 'path';
-import electron, { app, BrowserWindow, session, ipcMain, ipcRenderer } from 'electron';
+import electron, { app, BrowserWindow, session, ipcMain } from 'electron';
 import { startAvd } from './src/getAndroidAVDS';
 
 const isWin7 = os.release().startsWith('6.1');
@@ -44,6 +44,7 @@ app.on('ready', function (e) {
   const filter = {
     urls: ['*://*.steampowered.com/*']
   };
+
   session.defaultSession.webRequest.onBeforeSendHeaders(filter, (details, callback) => {
     details.requestHeaders['Origin'] = 'http://example.com/*';
     callback({ requestHeaders: details.requestHeaders });
