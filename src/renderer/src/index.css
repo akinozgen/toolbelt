@@ -30,7 +30,7 @@ body {
   margin-top: -20px;
   min-height: 3.5em;
   box-sizing: border-box !important;
-  position: absolute;
+  position: fixed;
   height: 4em;
   top: 0;
   left: 0;
