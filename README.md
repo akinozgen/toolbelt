@@ -37,12 +37,12 @@ I'm soooo open to help in this project, and i will try to make this appealing to
 ### Todo
 
 - [x] Use [daisyui](https://daisyui.com/) for ui.
+- [x] Add icons for left menu elements.
+- [x] Make left menu scrollable.
 - [ ] Ditch my stupid localstorage implementation and use vuex@next with persistence.
 - [ ] Use sqlite database for persistence.
 - [ ] Create settings for `ANDROID_HOME`, `ANDROID_AVD_HOME` and `STEAM_INSTALL_DIR`
-- [ ] Make left menu scrollable.
 - [ ] Make left menu elements pinnable. Show pinned elements fixed at bottom.
-- [ ] Add icons for left menu elements.
 - [ ] Create markdown editor with [codemirror](https://codemirror.net). Create previews with [marked](https://marked.js.org/).
 - [ ] Store and show saved markdown notes.
 
