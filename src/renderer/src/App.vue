@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
+import { onBeforeMount, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import Sidebar from './components/Sidebar.vue';
@@ -14,6 +14,12 @@ function sidebarClick() {
   if (sidebarClass.value === 'opened') sidebarClass.value = '';
   else sidebarClass.value = 'opened';
 }
+
+onBeforeMount(() => {
+  store.dispatch('changeTheme', {
+    theme: ''
+  });
+});
 
 onMounted(async () => {
   let startPage = store.getters.getStartPage || '/';

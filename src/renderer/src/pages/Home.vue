@@ -4,6 +4,20 @@
     <div class="pt-5">
       <div class="form-control">
         <label class="label">
+          <span class="label-text">Theme</span>
+        </label>
+        <select
+          @change="changeTheme"
+          v-model="theme"
+          class="select select-bordered w-full max-w-xs"
+        >
+          <option :value="key" v-for="(name, key) in availableThemes" :key="key">
+            {{ name }}
+          </option>
+        </select>
+      </div>
+      <div class="form-control">
+        <label class="label">
           <span class="label-text">Start page</span>
         </label>
         <select
@@ -95,8 +109,33 @@ const router = useRouter();
 const store = useStore(key);
 const routes = computed(() => router.getRoutes());
 
+const availableThemes = {
+  dark: 'Dark',
+  cupcake: 'Cupcake',
+  bumblebee: 'Bumblebee',
+  emerald: 'Emerald',
+  corporate: 'Corporate',
+  synthwave: 'Synthwave',
+  retro: 'Retro',
+  cyberpunk: 'Cyberpunk',
+  valentine: 'Valentine',
+  halloween: 'Halloween',
+  garden: 'Garden',
+  forest: 'Forest',
+  aqua: 'Aqua',
+  lofi: 'Lofi',
+  pastel: 'Pastel',
+  fantasy: 'Fantasy',
+  wireframe: 'Wireframe',
+  black: 'Black',
+  luxury: 'Luxury',
+  dracula: 'Dracula',
+  cmyk: 'Cmyk'
+};
+
 // if we have select with v-model this values don't need to be computed
 const startPage = store.getters.getStartPage;
+const theme = store.getters.getTheme;
 const androidHome = computed(() => store.getters.getAndroidSdkHome);
 const avdHome = computed(() => store.getters.getAVDHome);
 const steamDir = computed(() => store.getters.getSteamDir);
@@ -104,6 +143,12 @@ const steamDir = computed(() => store.getters.getSteamDir);
 function changeStartPage(e: any): void {
   store.commit('setStartPage', {
     start_page: e.target.value
+  });
+}
+
+function changeTheme(e: any) {
+  store.dispatch('changeTheme', {
+    theme: e.target.value
   });
 }
 
