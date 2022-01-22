@@ -44,3 +44,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
 }
+
+.video-checker {
+  width: 110%;
+  height: 110%;
+  position: absolute;
+  aspect-ratio: 16/10;
+  left: 0;
+  top: -2rem;
+  z-index: 2;
+}

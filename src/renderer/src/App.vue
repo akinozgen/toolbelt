@@ -29,7 +29,7 @@ onMounted(async () => {
         opened: sidebarClass == 'opened',
         'bg-opacity-10 text-white': platform === 'darwin'
       }"
-      class="sidebar pt-10 w-64 md:shadow bg-primary fixed h-full"
+      class="sidebar pt-10 w-64 md:shadow bg-primary fixed h-full z-10"
     >
       <Sidebar />
     </aside>

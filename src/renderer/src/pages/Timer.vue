@@ -136,7 +136,6 @@ function setAlarm() {
   alarmSetAt.value = `${hours.value}:${minutes.value}:${seconds.value}`;
   isAlarmSet.value = true;
   alarmNotice.value = `Alarm set for ${alarmSetAt.value}`;
-  console.log(tune);
 }
 
 function unsetAlarm() {
