@@ -3,7 +3,7 @@ import Home from '../pages/Home.vue';
 import MD5 from '../pages/MD5.vue';
 import Camera from '../pages/Camera.vue';
 import Mic from '../pages/Mic.vue';
-import Timer from '../pages/Timer.vue';
+import Alarm from '../pages/Alarm.vue';
 import MDPad from '../pages/MDPad.vue';
 import Android from '../pages/Android.vue';
 import GameLauncher from '../pages/GameLauncher.vue';
@@ -30,9 +30,9 @@ const routes = [
   },
 
   {
-    path: '/timer',
+    path: '/alarm',
     name: 'Alarm',
-    component: Timer,
+    component: Alarm,
     props: {
       icon: alarmIcon
     }
