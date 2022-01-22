@@ -87,18 +87,24 @@
 <script lang="ts" setup>
 import { useRouter } from 'vue-router';
 import { computed, ref, onMounted } from 'vue';
+import { key } from '../store';
+import { useStore } from 'vuex';
 
 const selector = ref<HTMLSelectElement>();
 const router = useRouter();
+const store = useStore(key);
 const routes = computed(() => router.getRoutes());
-const startPage = ref(localStorage.getItem('startPage') || '/');
-const androidHome = ref(localStorage.getItem('ANDROID_HOME') || '');
-const avdHome = ref(localStorage.getItem('AVD_HOME') || '');
-const steamDir = ref(localStorage.getItem('STEAM_DIR') || '');
+
+// if we have select with v-model this values don't need to be computed
+const startPage = store.getters.getStartPage;
+const androidHome = computed(() => store.getters.getAndroidSdkHome);
+const avdHome = computed(() => store.getters.getAVDHome);
+const steamDir = computed(() => store.getters.getSteamDir);
 
 function changeStartPage(e: any): void {
-  startPage.value = e.target.value;
-  localStorage.setItem('startPage', startPage.value);
+  store.commit('setStartPage', {
+    start_page: e.target.value
+  });
 }
 
 function androidHomeSelect() {
@@ -114,17 +120,20 @@ function steamDirSelect() {
 }
 
 window.ipcRenderer.on('dir_selected_android_home', function (event, ...params) {
-  localStorage.setItem('ANDROID_HOME', params[0]);
-  androidHome.value = params[0];
+  store.commit('setAndroidSdkHome', {
+    android_sdk_home: params[0][0]
+  });
 });
 
 window.ipcRenderer.on('dir_selected_avd_home', function (event, ...params) {
-  localStorage.setItem('AVD_HOME', params[0]);
-  avdHome.value = params[0];
+  store.commit('setAVDHome', {
+    avd_home: params[0][0]
+  });
 });
 
 window.ipcRenderer.on('dir_selected_steam', function (event, ...params) {
-  localStorage.setItem('STEAM_DIR', params[0]);
-  steamDir.value = params[0];
+  store.commit('setSteamDir', {
+    steam_dir: params[0][0]
+  });
 });
 </script>

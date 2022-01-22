@@ -7,7 +7,7 @@
         }"
         :to="route.path"
       >
-        <img :src="route.props.default.icon" class="w-5 mr-2" />
+        <img :src="route.props.default.icon" class="w-5 mr-2 opacity-80" />
         {{ route.name }}
         <hr v-if="route.props.default?.divider == true" />
       </router-link>

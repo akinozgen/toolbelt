@@ -1,10 +1,13 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 import Sidebar from './components/Sidebar.vue';
+import { key } from './store';
 
 const { platform } = window;
 const router = useRouter();
+const store = useStore(key);
 const sidebarClass = ref('');
 
 function sidebarClick() {
@@ -13,7 +16,7 @@ function sidebarClick() {
 }
 
 onMounted(async () => {
-  let startPage = localStorage.getItem('startPage') || '/';
+  let startPage = store.getters.getStartPage || '/';
   if (startPage != '/') {
     router.push(startPage);
   }
