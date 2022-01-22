@@ -9,41 +9,69 @@ import Android from '../pages/Android.vue';
 import GameLauncher from '../pages/GameLauncher.vue';
 import SSHLaunch from '../pages/SSHLaunch.vue';
 
+import settingsIcon from '../assets/001-setting.png';
+import alarmIcon from '../assets/002-alarm-clock.png';
+import md5Icon from '../assets/003-shield.png';
+import mdIcon from '../assets/004-asterisk.png';
+import avdIcon from '../assets/005-android.png';
+import sshIcon from '../assets/006-terminal.png';
+import gameIcon from '../assets/007-steam.png';
+import camIcon from '../assets/008-webcam.png';
+import micIcon from '../assets/009-microphone-black-shape.png';
+
 const routes = [
   {
     path: '/',
     name: 'Home Page',
-    component: Home
+    component: Home,
+    props: {
+      icon: settingsIcon
+    }
   },
 
   {
     path: '/timer',
     name: 'Alarm',
-    component: Timer
+    component: Timer,
+    props: {
+      icon: alarmIcon
+    }
   },
 
   {
     path: '/md5',
     name: 'MD5 Encrypter',
-    component: MD5
+    component: MD5,
+    props: {
+      icon: md5Icon
+    }
   },
 
   {
     path: '/mdpad',
     name: 'MD Notepad',
-    component: MDPad
+    component: MDPad,
+    props: {
+      icon: mdIcon
+    }
   },
 
   {
     path: '/android',
     name: 'AVDs',
-    component: Android
+    component: Android,
+    props: {
+      icon: avdIcon
+    }
   },
 
   {
     path: '/ssh_launch',
     name: 'SSH Launcher',
-    component: SSHLaunch
+    component: SSHLaunch,
+    props: {
+      icon: sshIcon
+    }
   },
 
   {
@@ -51,20 +79,27 @@ const routes = [
     name: 'Game Launcher',
     component: GameLauncher,
     props: {
-      divider: true
+      divider: true,
+      icon: gameIcon
     }
   },
 
   {
     path: '/camera',
     name: 'Camera Check',
-    component: Camera
+    component: Camera,
+    props: {
+      icon: camIcon
+    }
   },
 
   {
     path: '/mic',
     name: 'Mic. Check',
-    component: Mic
+    component: Mic,
+    props: {
+      icon: micIcon
+    }
   }
 ];
 

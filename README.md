@@ -35,9 +35,11 @@ Because i have a windows laptop, a linux laptop and a macbook in the office :)
 I'm soooo open to help in this project, and i will try to make this appealing to everyone in need.
 
 ### Todo
+
+- [x] Use [daisyui](https://daisyui.com/) for ui.
 - [ ] Ditch my stupid localstorage implementation and use vuex@next with persistence.
-- [ ] Use sqlite database for persistence. 
-- [ ] Create settings for `ANDROID_HOME`, `ANDROID_AVD_HOME` and `STEAM_INSTALL_DIR` 
+- [ ] Use sqlite database for persistence.
+- [ ] Create settings for `ANDROID_HOME`, `ANDROID_AVD_HOME` and `STEAM_INSTALL_DIR`
 - [ ] Make left menu scrollable.
 - [ ] Make left menu elements pinnable. Show pinned elements fixed at bottom.
 - [ ] Add icons for left menu elements.
@@ -45,7 +47,7 @@ I'm soooo open to help in this project, and i will try to make this appealing to
 - [ ] Store and show saved markdown notes.
 
 #### Maybe i'll do them later
-- [ ] Use [daisyui](https://daisyui.com/) for ui.
+
 - [ ] Make an audio visualizer in microphone check page.
 - [ ] Open, save, load markdown notes from local file system.
 - [ ] Export, import settings.
@@ -56,7 +58,7 @@ I'm soooo open to help in this project, and i will try to make this appealing to
 - [ ] Repl for configured languages, Eg. Selectable compiler and compilation options.
 - [ ] Spotify currently playing and devices. (will put api key in settings.)
 - [ ] Spotify playback controller.
- 
+
 ### Development
 
 Simply clone the repo and install dependencies with yarn or npm
