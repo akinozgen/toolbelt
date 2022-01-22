@@ -4,20 +4,6 @@
     <div class="pt-5">
       <div class="form-control">
         <label class="label">
-          <span class="label-text">Theme</span>
-        </label>
-        <select
-          @change="changeTheme"
-          v-model="theme"
-          class="select select-bordered w-full max-w-xs"
-        >
-          <option :value="key" v-for="(name, key) in availableThemes" :key="key">
-            {{ name }}
-          </option>
-        </select>
-      </div>
-      <div class="form-control">
-        <label class="label">
           <span class="label-text">Start page</span>
         </label>
         <select
@@ -28,6 +14,20 @@
         >
           <option :value="route.path" :key="route.path" v-for="route in router.getRoutes()">
             {{ route.name?.toString() }}
+          </option>
+        </select>
+      </div>
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Theme</span>
+        </label>
+        <select
+          @change="changeTheme"
+          v-model="theme"
+          class="select select-bordered w-full max-w-xs"
+        >
+          <option :value="key" v-for="(name, key) in availableThemes" :key="key">
+            {{ name }}
           </option>
         </select>
       </div>
