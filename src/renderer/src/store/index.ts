@@ -6,6 +6,7 @@ export interface AppSettingsState {
   steam_install_dir: string;
   avd_home: string;
   android_sdk_home: string;
+  theme: string;
 }
 
 export interface AlarmState {
@@ -13,6 +14,8 @@ export interface AlarmState {
   selected_minutes: string;
   selected_seconds: string;
   alarm_tone: string;
+
+  isAlarmSet: boolean;
 }
 
 export interface SSHSession {
@@ -49,13 +52,15 @@ export const store = createStore<State>({
           android_sdk_home: '',
           avd_home: '',
           start_page: '/',
-          steam_install_dir: ''
+          steam_install_dir: '',
+          theme: 'bumblebee'
         },
         alarm: {
-          alarm_tone: '',
-          selected_hours: '',
-          selected_minutes: '',
-          selected_seconds: ''
+          alarm_tone: 'siren',
+          selected_hours: '00',
+          selected_minutes: '00',
+          selected_seconds: '00',
+          isAlarmSet: false
         },
         avds: [],
         games: [],
@@ -69,6 +74,11 @@ export const store = createStore<State>({
       state.alarm.selected_minutes = minutes;
       state.alarm.selected_seconds = seconds;
       state.alarm.alarm_tone = tone;
+      state.alarm.isAlarmSet = true;
+    },
+
+    clearAlarm(state) {
+      state.alarm.isAlarmSet = false;
     },
 
     setStartPage(state, { start_page }) {
@@ -125,7 +135,7 @@ export const store = createStore<State>({
     },
 
     getParsedAlarmTime(state) {
-      return `${state.alarm.selected_hours}:${state.alarm.selected_minutes}:${state.alarm.selected_minutes}`;
+      return `${state.alarm.selected_hours}:${state.alarm.selected_minutes}:${state.alarm.selected_seconds}`;
     },
 
     getSSHSession(state, { id }) {
@@ -142,9 +152,82 @@ export const store = createStore<State>({
 
     getSSHSessions(state) {
       return state.ssh_sessions;
+    },
+
+    isAlarmSet(state) {
+      return state.alarm.isAlarmSet;
+    },
+
+    getAlarmHours(state) {
+      return state.alarm.selected_hours;
+    },
+
+    getAlarmMinutes(state) {
+      return state.alarm.selected_minutes;
+    },
+
+    getAlarmSeconds(state) {
+      return state.alarm.selected_seconds;
+    },
+
+    getTheme(state) {
+      return state.app_settings.theme;
+    }
+  },
+  // Getters end
+
+  // Actions
+  actions: {
+    setAlarmFromPreset(state, { preset }) {
+      let now = new Date();
+
+      switch (preset) {
+        case '5_mins':
+          now = now.addMinutes(5);
+          break;
+        case '15_mins':
+          now = now.addMinutes(15);
+          break;
+        case '1_hour':
+          now = now.addHours(1);
+          break;
+        case '2_hours':
+          now = now.addHours(2);
+          break;
+        case '5_hours':
+          now = now.addHours(5);
+          break;
+        case '8_hours':
+          now = now.addHours(8);
+          break;
+        case '10_hours':
+          now = now.addHours(8);
+          break;
+        case '12_hours':
+          now = now.addHours(12);
+          break;
+      }
+
+      let parts = now.toLocaleTimeString().split(':');
+      if (parts.length != 3) return;
+
+      state.state.alarm.selected_hours = parts[0];
+      state.state.alarm.selected_minutes = parts[1];
+      state.state.alarm.selected_seconds = parts[2];
+    },
+
+    changeTheme(state, { theme }) {
+      if (theme != '') {
+        state.state.app_settings.theme = theme;
+      }
+
+      let html = document.querySelector('html');
+      if (html) {
+        html.dataset.theme = state.state.app_settings.theme;
+      }
     }
   }
-  // Getters end
+  // Actions end
 });
 
 store.watch(

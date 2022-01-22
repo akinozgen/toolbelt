@@ -5,7 +5,7 @@
       <div class="flex justify-between">
         <p class="text-left self-center">Current time: {{ currentTime }}</p>
         <div class="dropdown dropdown-end">
-          <button tabindex="0" class="btn btn-error btn-block btn-sm btn-outline lowercase">
+          <button tabindex="0" class="btn text-secondary btn-block btn-sm lowercase btn-ghost">
             Presets
           </button>
           <ul tabindex="0" class="shadow-lg menu dropdown-content bg-base-100 rounded-box w-52">
@@ -27,7 +27,11 @@
           <label class="label">
             <span class="label-text">Hour</span>
           </label>
-          <select v-model="hours" ref="selector" class="select select-bordered w-full max-w-xs">
+          <select
+            v-model="store.state.alarm.selected_hours"
+            ref="selector"
+            class="select select-bordered w-full max-w-xs"
+          >
             <option v-for="hour in numberRangeFilled(24)" :value="hour" :key="hour">
               {{ hour }}
             </option>
@@ -37,7 +41,11 @@
           <label class="label">
             <span class="label-text">Minute</span>
           </label>
-          <select v-model="minutes" ref="selector" class="select select-bordered w-full max-w-xs">
+          <select
+            v-model="store.state.alarm.selected_minutes"
+            ref="selector"
+            class="select select-bordered w-full max-w-xs"
+          >
             <option v-for="minute in numberRangeFilled(60)" :value="minute" :key="minute">
               {{ minute }}
             </option>
@@ -47,7 +55,11 @@
           <label class="label">
             <span class="label-text">Second</span>
           </label>
-          <select v-model="seconds" ref="selector" class="select select-bordered w-full max-w-xs">
+          <select
+            v-model="store.state.alarm.selected_seconds"
+            ref="selector"
+            class="select select-bordered w-full max-w-xs"
+          >
             <option v-for="second in numberRangeFilled(60)" :value="second" :key="second">
               {{ second }}
             </option>
@@ -98,22 +110,27 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, Ref, onMounted } from 'vue';
+import { ref, Ref, onMounted, computed } from 'vue';
 
 import sirenMP3 from '../assets/siren.mp3';
 import nukeMP3 from '../assets/nuke.mp3';
 
-const tune = ref('siren');
-const currentDateTime = new Date();
-const currentTime = ref(currentDateTime.toLocaleTimeString());
-const alarmSetAt = ref('00:00:00');
-const isAlarmSet = ref(false);
+import { useStore } from 'vuex';
+import { key } from '../store';
+
+const store = useStore(key);
+const tune = ref(store.state.alarm.alarm_tone);
+
+const hours = computed(() => store.state.alarm.selected_hours);
+const minutes = computed(() => store.state.alarm.selected_minutes);
+const seconds = computed(() => store.state.alarm.selected_seconds);
+
+const isAlarmSet = computed(() => store.getters.isAlarmSet);
+const alarmSetAt = computed(() => store.getters.getParsedAlarmTime);
+
+const currentTime = ref(new Date().toLocaleTimeString());
 const alarmNotice = ref('');
 const audioPlayer = ref(null);
-
-const hours = ref('00');
-const minutes = ref('00');
-const seconds = ref('00');
 
 setInterval(() => {
   currentTime.value = new Date().toLocaleTimeString();
@@ -133,14 +150,19 @@ function setAlarm() {
   if (isAlarmSet.value) {
     return unsetAlarm();
   }
-  alarmSetAt.value = `${hours.value}:${minutes.value}:${seconds.value}`;
-  isAlarmSet.value = true;
+
+  store.commit('setAlarm', {
+    hours: hours.value,
+    minutes: minutes.value,
+    seconds: seconds.value,
+    tone: tune.value
+  });
+
   alarmNotice.value = `Alarm set for ${alarmSetAt.value}`;
 }
 
 function unsetAlarm() {
-  alarmSetAt.value = '00:00:00';
-  isAlarmSet.value = false;
+  store.commit('clearAlarm');
   alarmNotice.value = '';
 
   if (audioPlayer.value) {
@@ -152,39 +174,8 @@ function unsetAlarm() {
 
 function selectPreset(preset: string = ''): void {
   if (preset.length == 0) return;
-  let now = new Date();
 
-  switch (preset) {
-    case '5_mins':
-      now = now.addMinutes(5);
-      break;
-    case '15_mins':
-      now = now.addMinutes(15);
-      break;
-    case '1_hour':
-      now = now.addHours(1);
-      break;
-    case '2_hours':
-      now = now.addHours(2);
-      break;
-    case '5_hours':
-      now = now.addHours(5);
-      break;
-    case '8_hours':
-      now = now.addHours(8);
-      break;
-    case '10_hours':
-      now = now.addHours(8);
-      break;
-    case '12_hours':
-      now = now.addHours(12);
-      break;
-  }
-
-  let parts = now.toLocaleTimeString().split(':');
-  hours.value = parts[0];
-  minutes.value = parts[1];
-  seconds.value = parts[2];
+  store.dispatch('setAlarmFromPreset', { preset });
 }
 
 async function playTune() {
