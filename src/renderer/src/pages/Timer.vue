@@ -2,7 +2,26 @@
   <section class="p-10">
     <h1 class="text-left">Alarm</h1>
     <div class="text-left pt-5 font-bold">
-      <div class="text-left">Current time: {{ currentTime }}</div>
+      <div class="flex justify-between">
+        <p class="text-left self-center">Current time: {{ currentTime }}</p>
+        <div class="dropdown dropdown-end">
+          <button tabindex="0" class="btn btn-error btn-block btn-sm btn-outline lowercase">
+            Presets
+          </button>
+          <ul tabindex="0" class="shadow-lg menu dropdown-content bg-base-100 rounded-box w-52">
+            <li @click="selectPreset('now')"><a>Now</a></li>
+            <li @click="selectPreset('5_mins')"><a>5 Minutes Later</a></li>
+            <li @click="selectPreset('15_mins')"><a>15 Minutes Later</a></li>
+            <li @click="selectPreset('1_hour')"><a>1 Hour Later</a></li>
+            <li @click="selectPreset('2_hours')"><a>2 Hours Later</a></li>
+            <li @click="selectPreset('5_hours')"><a>5 Hours Later</a></li>
+            <li @click="selectPreset('8_hours')"><a>8 Hours Later</a></li>
+            <li @click="selectPreset('10_hours')"><a>10 Hours Later</a></li>
+            <li @click="selectPreset('12_hours')"><a>12 Hours Later</a></li>
+          </ul>
+        </div>
+      </div>
+
       <div class="pt-5 flex w-full justify-between align-baseline">
         <div class="form-control flex-1 ml-2">
           <label class="label">
@@ -130,6 +149,43 @@ function unsetAlarm() {
     audioPlayer.value.pause();
     audioPlayer.value = null;
   }
+}
+
+function selectPreset(preset: string = ''): void {
+  if (preset.length == 0) return;
+  let now = new Date();
+
+  switch (preset) {
+    case '5_mins':
+      now = now.addMinutes(5);
+      break;
+    case '15_mins':
+      now = now.addMinutes(15);
+      break;
+    case '1_hour':
+      now = now.addHours(1);
+      break;
+    case '2_hours':
+      now = now.addHours(2);
+      break;
+    case '5_hours':
+      now = now.addHours(5);
+      break;
+    case '8_hours':
+      now = now.addHours(8);
+      break;
+    case '10_hours':
+      now = now.addHours(8);
+      break;
+    case '12_hours':
+      now = now.addHours(12);
+      break;
+  }
+
+  let parts = now.toLocaleTimeString().split(':');
+  hours.value = parts[0];
+  minutes.value = parts[1];
+  seconds.value = parts[2];
 }
 
 async function playTune() {
