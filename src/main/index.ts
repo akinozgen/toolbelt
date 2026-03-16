@@ -1,10 +1,8 @@
-import os from 'os';
 import path from 'path';
-import electron, { app, BrowserWindow, session, ipcMain } from 'electron';
-import { startAvd } from './src/getAndroidAVDS';
-
-const isWin7 = os.release().startsWith('6.1');
-if (isWin7) app.disableHardwareAcceleration();
+import fs from 'fs';
+import os from 'os';
+import electron, { app, BrowserWindow, ipcMain } from 'electron';
+import Store from 'electron-store';
 
 if (!app.requestSingleInstanceLock()) {
   app.quit();
@@ -12,97 +10,101 @@ if (!app.requestSingleInstanceLock()) {
 }
 
 let win: BrowserWindow | null = null;
+const eStore = new Store({ name: 'toolbelt' });
 
 async function bootstrap() {
   win = new BrowserWindow({
     webPreferences: {
-      preload: path.join(__dirname, '../preload/index.cjs')
+      preload: path.join(__dirname, '../preload/index.cjs'),
+      sandbox: false
     },
     autoHideMenuBar: true,
     titleBarStyle: 'hidden',
     frame: false,
-    minWidth: 400,
-    minHeight: 640,
+    minWidth: 1280,
+    minHeight: 800,
     titleBarOverlay: false,
-    vibrancy: 'dark',
+    backgroundColor: '#00000000',
+    ...(process.platform === 'darwin' ? { vibrancy: 'dark' } : {}),
+    ...(process.platform === 'win32'  ? { backgroundMaterial: 'acrylic' } : {}),
     width: 815
   });
 
   win.setMenu(null);
 
+  // Keep acrylic; color consistency is handled by unified UI overlay
+
   if (app.isPackaged) {
     win.loadFile(path.join(__dirname, '../renderer/index.html'));
   } else {
-    const url = `http://127.0.0.1:8000`;
-
-    win.loadURL(url);
+    win.loadURL(`http://127.0.0.1:8000`);
     win.webContents.openDevTools();
   }
 }
 
-app.on('ready', function (e) {
-  const filter = {
-    urls: ['*://*.steampowered.com/*']
-  };
-
-  session.defaultSession.webRequest.onBeforeSendHeaders(filter, (details, callback) => {
-    details.requestHeaders['Origin'] = 'http://example.com/*';
-    callback({ requestHeaders: details.requestHeaders });
-  });
-
-  session.defaultSession.webRequest.onHeadersReceived(filter, (details, callback) => {
-    if (!details?.responseHeaders) {
-      details.responseHeaders = {};
-    }
-    details.responseHeaders['access-control-allow-origin'] = ['http://127.0.0.1:8000'];
-    callback({ responseHeaders: details.responseHeaders });
-  });
-});
-
 app.whenReady().then(bootstrap);
 
 app.on('window-all-closed', () => {
-  win = null;
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  app.quit();
 });
 
 app.on('second-instance', () => {
   if (win) {
-    // someone tried to run a second instance, we should focus our window.
     if (win.isMinimized()) win.restore();
     win.focus();
   }
 });
 
-ipcMain.on('start_avd', function (e, avdName) {
-  startAvd(avdName);
+// ── Window controls ──────────────────────────────────────────────────
+ipcMain.on('window_minimize', () => win?.minimize());
+ipcMain.on('window_maximize', () => {
+  win?.isMaximized() ? win.unmaximize() : win?.maximize();
 });
+ipcMain.on('window_close', () => win?.close());
 
-ipcMain.on('open_dir_select_android_home', function (e) {
-  const select = electron.dialog.showOpenDialogSync({
-    title: 'Please Select Android SDK Home',
-    properties: ['openDirectory']
-  });
+// ─── Electron Store IPC ──────────────────────────────────────────────
+ipcMain.handle('estore:get', (_e, key: string) => eStore.get(key));
+ipcMain.handle('estore:set', (_e, key: string, value: any) => eStore.set(key, value));
+ipcMain.handle('estore:delete', (_e, key: string) => eStore.delete(key));
+ipcMain.handle('estore:has', (_e, key: string) => eStore.has(key));
 
-  win?.webContents.send('dir_selected_android_home', select);
+// ─── File System IPC (read-only) ─────────────────────────────────────
+ipcMain.handle('fs:homedir', () => os.homedir());
+ipcMain.handle('fs:exists', (_e, p: string) => fs.existsSync(p));
+ipcMain.handle('fs:readDir', async (_e, p: string) => {
+  const entries = await fs.promises.readdir(p, { withFileTypes: true });
+  return entries
+    .map(e => ({ name: e.name, path: path.join(p, e.name), isDir: e.isDirectory() }))
+    .sort((a, b) => (a.isDir !== b.isDir ? (a.isDir ? -1 : 1) : a.name.localeCompare(b.name)));
 });
+ipcMain.handle('fs:readDirWithStats', async (_e, p: string) => {
+  const entries = await fs.promises.readdir(p, { withFileTypes: true });
+  const mapped = entries.map(e => ({
+    name: e.name,
+    path: path.join(p, e.name),
+    isDir: e.isDirectory(),
+  }));
+  const maxConcurrency = 64;
+  let idx = 0;
+  const results: { name: string; path: string; isDir: boolean; size: number; mtimeMs: number }[] = new Array(mapped.length);
 
-ipcMain.on('open_dir_select_avd_home', function (e) {
-  const select = electron.dialog.showOpenDialogSync({
-    title: 'Please Select AVD Home',
-    properties: ['openDirectory']
-  });
+  const worker = async () => {
+    while (idx < mapped.length) {
+      const i = idx++;
+      const entry = mapped[i];
+      try {
+        const stat = await fs.promises.stat(entry.path);
+        results[i] = { ...entry, size: stat.size, mtimeMs: stat.mtimeMs };
+      } catch {
+        results[i] = { ...entry, size: 0, mtimeMs: 0 };
+      }
+    }
+  };
 
-  win?.webContents.send('dir_selected_avd_home', select);
+  await Promise.all(Array.from({ length: Math.min(maxConcurrency, mapped.length) }, worker));
+  return results.sort((a, b) => (a.isDir !== b.isDir ? (a.isDir ? -1 : 1) : a.name.localeCompare(b.name)));
 });
-
-ipcMain.on('open_dir_select_steam_dir', function (e) {
-  const select = electron.dialog.showOpenDialogSync({
-    title: 'Please Select Steam Installation Directory',
-    properties: ['openDirectory']
-  });
-
-  win?.webContents.send('dir_selected_steam', select);
+ipcMain.handle('fs:stat', async (_e, p: string) => {
+  const stat = await fs.promises.stat(p);
+  return { size: stat.size, mtimeMs: stat.mtimeMs };
 });

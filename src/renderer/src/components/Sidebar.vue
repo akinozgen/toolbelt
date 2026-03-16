@@ -1,26 +1,40 @@
-<template>
-  <ul class="menu w-64 menu-compact lg:menu-normal">
-    <li v-for="route in router.getRoutes()" :key="route.path">
-      <router-link
-        :class="{
-          active: currentRoute == route.path
-        }"
-        :to="route.path"
-      >
-        <img :src="route.props.default.icon" class="w-5 mr-2 opacity-80" />
-        {{ route.name }}
-        <hr v-if="route.props.default?.divider == true" />
-      </router-link>
-    </li>
-  </ul>
-</template>
-
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue';
-import { Router, useRouter } from 'vue-router';
+import { computed, type Component } from 'vue';
+import { useRouter } from 'vue-router';
+import {
+  Home, AlarmClock, Hash, NotebookPen, Settings,
+  Braces, Binary, SendHorizontal, Diff, Regex
+} from 'lucide-vue-next';
 
-const router: Router = useRouter();
-const currentRoute = computed(() => {
-  return router.currentRoute.value.fullPath;
-});
+const iconMap: Record<string, Component> = {
+  '/':         Home,
+  '/alarm':    AlarmClock,
+  '/md5':      Hash,
+  '/mdpad':    NotebookPen,
+  '/formatter': Braces,
+  '/encoder':   Binary,
+  '/requests':  SendHorizontal,
+  '/diff':      Diff,
+  '/regex':     Regex,
+  '/settings':  Settings,
+};
+
+const router = useRouter();
+const currentRoute = computed(() => router.currentRoute.value.fullPath);
 </script>
+
+<template>
+  <nav class="flex flex-col gap-0.5 p-2 flex-1">
+    <template v-for="route in router.getRoutes()" :key="route.path">
+      <hr v-if="route.props.default?.divider" class="divider" />
+      <router-link
+        :to="route.path"
+        class="nav-link"
+        :class="{ active: currentRoute === route.path }"
+      >
+        <component :is="iconMap[route.path]" :size="16" class="nav-icon" />
+        <span>{{ route.name }}</span>
+      </router-link>
+    </template>
+  </nav>
+</template>

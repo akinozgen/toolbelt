@@ -1,49 +1,43 @@
 <script lang="ts" setup>
-import { onBeforeMount, onMounted, ref } from 'vue';
+import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
+import { Minus, Square, X } from 'lucide-vue-next';
 import Sidebar from './components/Sidebar.vue';
 import { key } from './store';
 
-const { platform } = window;
 const router = useRouter();
-const store = useStore(key);
-const sidebarClass = ref('');
-
-function sidebarClick() {
-  if (sidebarClass.value === 'opened') sidebarClass.value = '';
-  else sidebarClass.value = 'opened';
-}
-
-onBeforeMount(() => {
-  store.dispatch('changeTheme', {
-    theme: ''
-  });
-});
+const store  = useStore(key);
 
 onMounted(async () => {
-  let startPage = store.getters.getStartPage || '/';
-  if (startPage != '/') {
-    router.push(startPage);
-  }
+  const startPage = store.getters.getStartPage || '/';
+  if (startPage !== '/') router.push(startPage);
 });
+
+const minimizeWindow = () => window.ipcRenderer.send('window_minimize');
+const maximizeWindow = () => window.ipcRenderer.send('window_maximize');
+const closeWindow    = () => window.ipcRenderer.send('window_close');
 </script>
 
 <template>
-  <div id="titlebar"></div>
-  <div class="container flex flex-row min-h-screen" :class="platform === 'darwin' ? 'vibrant' : ''">
+  <div id="titlebar">
+    <button class="wc-btn"       @click="minimizeWindow" title="Minimize"><Minus  :size="13" /></button>
+    <button class="wc-btn"       @click="maximizeWindow" title="Maximize"><Square :size="11" /></button>
+    <button class="wc-btn wc-close" @click="closeWindow" title="Close"  ><X      :size="13" /></button>
+  </div>
+  <div class="app-unified-bg"></div>
+
+  <div class="flex min-h-screen" style="background: transparent; position: relative; z-index: 2;">
     <aside
-      @click="sidebarClick()"
-      :class="{
-        opened: sidebarClass == 'opened',
-        'bg-opacity-10 text-white': platform === 'darwin'
-      }"
-      class="sidebar pt-10 w-64 md:shadow bg-primary fixed h-full z-10 overflow-auto"
+      class="fixed z-10 flex flex-col"
+      style="top: var(--titlebar-height); bottom: 0; width: var(--sidebar-width); background: transparent; border-right: none; padding-top: 0;"
     >
       <Sidebar />
     </aside>
-    <main class="main pt-10 flex flex-col flex-grow ml-64">
-      <router-view />
+    <main class="flex flex-col flex-grow" style="margin-left: var(--sidebar-width);">
+      <div class="content-shell">
+        <router-view />
+      </div>
     </main>
   </div>
 </template>

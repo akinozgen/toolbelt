@@ -36,28 +36,11 @@ I'm soooo open to help in this project, and i will try to make this appealing to
 
 ### Todo
 
-- [x] Use [daisyui](https://daisyui.com/) for ui.
-- [x] Add icons for left menu elements.
-- [x] Make left menu scrollable.
-- [x] Create settings for `ANDROID_HOME`, `ANDROID_AVD_HOME` and `STEAM_INSTALL_DIR`
-- [ ] Ditch my stupid localstorage implementation and use vuex@next with persistence.
-- [ ] Use sqlite database for persistence.
-- [ ] Make left menu elements pinnable. Show pinned elements fixed at bottom.
-- [ ] Create markdown editor with [codemirror](https://codemirror.net). Create previews with [marked](https://marked.js.org/).
-- [ ] Store and show saved markdown notes.
-
-#### Maybe i'll do them later
-
-- [ ] Make an audio visualizer in microphone check page.
-- [ ] Open, save, load markdown notes from local file system.
-- [ ] Export, import settings.
-- [ ] Google-keep like postit note taking.
-- [ ] Openssl encrypted password vault with import export functionality.
-- [ ] Two factor authentication generator. export, import etc.
-- [ ] Custom iframe link for left menu item. Selectable icon, name, pinnable.
-- [ ] Repl for configured languages, Eg. Selectable compiler and compilation options.
-- [ ] Spotify currently playing and devices. (will put api key in settings.)
-- [ ] Spotify playback controller.
+- [ ] Formatter screen (HTML, CSS, JS, JSON, XML, YAML)
+- [ ] Encoder screen (Base64, URL)
+- [ ] Requests screen (headers, payload editor, method, response, prettier)
+- [ ] Diff screen
+- [ ] Regex tester screen
 
 ### Development
 

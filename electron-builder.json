@@ -1,9 +1,7 @@
 {
   "appId": "com.akinozgen.toolbelt",
   "asar": true,
-  "directories": {
-    "output": "release/${version}"
-  },
+  "directories": { "output": "release/${version}" },
   "files": [
     "!node_modules",
     "dist",

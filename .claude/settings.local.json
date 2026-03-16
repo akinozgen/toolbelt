@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node:*)",
+      "Bash(cd:*)",
+      "Bash(cd /c/Users/akino/Desktop/Personal/Projects/toolbelt && npm install 2>&1)",
+      "Bash(kill %1:*)",
+      "Bash(tail:*)",
+      "Bash(cd \"C:\\\\Users\\\\akino\\\\Desktop\\\\Personal\\\\Projects\\\\toolbelt\" && npm install vue-codemirror @codemirror/lang-markdown @codemirror/theme-one-dark 2>&1)"
+    ]
+  }
+}

@@ -1,15 +1,18 @@
 <template>
-  <div class="flex space-x-2 relative">
-    <slot />
-    <button class="absolute top-0 right-0 rounded-l-none btn btn-primary" @click="copyText">
-      <img :src="copyIcon" alt="" class="w-5" />
+  <div class="flex gap-2 w-full">
+    <div class="flex-1 min-w-0">
+      <slot />
+    </div>
+    <button class="btn btn-secondary flex-shrink-0" @click="copyText" :title="copied ? 'Copied!' : 'Copy'">
+      <Check v-if="copied" :size="14" />
+      <ClipboardCopy v-else :size="14" />
     </button>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { defineComponent } from 'vue';
-import copyIcon from '../assets/copy.png';
+import { ref } from 'vue';
+import { Check, ClipboardCopy } from 'lucide-vue-next';
 import Clipboard from '../helpers/clipboard';
 
 const props = defineProps({
@@ -19,11 +22,12 @@ const props = defineProps({
   }
 });
 
-async function copyText() {
-  const cp = Clipboard({
-    appendToBody: false
-  });
+const copied = ref(false);
 
+async function copyText() {
+  const cp = Clipboard({ appendToBody: false });
   cp.toClipboard(props.textToCopy);
+  copied.value = true;
+  setTimeout(() => (copied.value = false), 1500);
 }
 </script>
