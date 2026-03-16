@@ -1,13 +1,36 @@
-node_modules
-.DS_Store
-dist
-dist-ssr
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+dist-ssr/
+
+# Tauri build artifacts
+src-tauri/target/
+src-tauri/gen/
+
+# Vite
 *.local
+.vite/
 
-tmp
-**/.tmp
-release
-.vscode
-.idea
+# Editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
-!.i-dont-know-what-am-i-doing-with-my-life
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Env
+.env
+.env.local
+.env.*.local
