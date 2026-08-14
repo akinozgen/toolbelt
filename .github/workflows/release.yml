@@ -1,0 +1,220 @@
+name: Release
+
+# Push a semver tag to cut a release:
+#   git tag v1.4.0 && git push origin v1.4.0
+#
+# Builds a Linux AppImage + .deb and a Windows Inno Setup installer + portable
+# exe, then publishes them to a GitHub Release. `workflow_dispatch` runs the
+# same build but stops short of publishing, so the pipeline can be smoke-tested.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (no leading v), e.g. 1.4.0'
+        required: true
+        default: '0.0.0'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Resolve version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+      prerelease: ${{ steps.v.outputs.prerelease }}
+    steps:
+      - id: v
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            version="${{ inputs.version }}"
+          else
+            version="${GITHUB_REF_NAME#v}"
+          fi
+          version="${version#v}"
+          if ! printf '%s' "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$'; then
+            echo "::error::'$version' is not a valid semver version"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          case "$version" in
+            *-*) echo "prerelease=true"  >> "$GITHUB_OUTPUT" ;;
+            *)   echo "prerelease=false" >> "$GITHUB_OUTPUT" ;;
+          esac
+          echo "Building version $version"
+
+  linux:
+    name: Linux (AppImage + deb)
+    needs: prepare
+    # 22.04 keeps the glibc floor low enough for the AppImage to run on older distros.
+    runs-on: ubuntu-22.04
+    env:
+      # appimagetool needs FUSE otherwise; extracting instead works headless.
+      APPIMAGE_EXTRACT_AND_RUN: 1
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libwebkit2gtk-4.1-dev \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libssl-dev \
+            libxdo-dev \
+            patchelf \
+            file \
+            desktop-file-utils \
+            build-essential \
+            curl wget
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+          key: linux
+
+      - run: npm ci
+
+      - name: Sync version from tag
+        run: node scripts/set-version.mjs "${{ needs.prepare.outputs.version }}"
+
+      - name: Build bundles
+        run: npx tauri build --bundles appimage,deb
+
+      - name: Collect artifacts
+        run: |
+          set -e
+          version="${{ needs.prepare.outputs.version }}"
+          mkdir -p out
+          appimage=$(find src-tauri/target/release/bundle/appimage -name '*.AppImage' | head -n1)
+          deb=$(find src-tauri/target/release/bundle/deb -name '*.deb' | head -n1)
+          test -n "$appimage" || { echo "::error::no AppImage produced"; exit 1; }
+          test -n "$deb"      || { echo "::error::no .deb produced"; exit 1; }
+          cp "$appimage" "out/Toolbelt_${version}_amd64.AppImage"
+          cp "$deb"      "out/Toolbelt_${version}_amd64.deb"
+          ls -lh out
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: out/*
+          if-no-files-found: error
+
+  windows:
+    name: Windows (Inno Setup + portable)
+    needs: prepare
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+          key: windows
+
+      - run: npm ci
+
+      - name: Sync version from tag
+        run: node scripts/set-version.mjs "${{ needs.prepare.outputs.version }}"
+
+      - name: Build binary
+        # Bundling is handled by Inno Setup below, so skip Tauri's NSIS/MSI bundlers.
+        run: npx tauri build --no-bundle
+
+      - name: Resolve ISCC
+        id: iscc
+        shell: pwsh
+        run: |
+          $candidates = @(
+            "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
+            "${env:ProgramFiles}\Inno Setup 6\ISCC.exe"
+          )
+          $iscc = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+          if (-not $iscc) {
+            Write-Host "Inno Setup not present on the runner, installing..."
+            choco install innosetup -y --no-progress
+            $iscc = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+          }
+          if (-not $iscc) { throw "ISCC.exe could not be located" }
+          Write-Host "Using $iscc"
+          "path=$iscc" >> $env:GITHUB_OUTPUT
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          $exe = Join-Path $PWD 'src-tauri\target\release\toolbelt.exe'
+          if (-not (Test-Path $exe)) { throw "Built binary not found at $exe" }
+          & "${{ steps.iscc.outputs.path }}" `
+            "/DAppVersion=${{ needs.prepare.outputs.version }}" `
+            "/DSourceExe=$exe" `
+            "src-tauri\inno\toolbelt.iss"
+          if ($LASTEXITCODE -ne 0) { throw "ISCC failed with exit code $LASTEXITCODE" }
+
+      - name: Collect artifacts
+        shell: pwsh
+        run: |
+          $version = "${{ needs.prepare.outputs.version }}"
+          New-Item -ItemType Directory -Force out | Out-Null
+          $setup = Get-ChildItem 'src-tauri\target\release\bundle\inno' -Filter '*.exe' |
+                   Select-Object -First 1
+          if (-not $setup) { throw "No installer produced" }
+          Copy-Item $setup.FullName "out\Toolbelt_${version}_x64-setup.exe"
+          Copy-Item 'src-tauri\target\release\toolbelt.exe' "out\Toolbelt_${version}_x64-portable.exe"
+          Get-ChildItem out | Format-Table Name, Length
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: out/*
+          if-no-files-found: error
+
+  release:
+    name: Publish release
+    needs: [prepare, linux, windows]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Checksums
+        run: |
+          cd artifacts
+          sha256sum * > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: Toolbelt v${{ needs.prepare.outputs.version }}
+          tag_name: ${{ github.ref_name }}
+          generate_release_notes: true
+          prerelease: ${{ needs.prepare.outputs.prerelease == 'true' }}
+          fail_on_unmatched_files: true
+          files: artifacts/*
