@@ -2,9 +2,15 @@ import { InjectionKey } from 'vue';
 import { createStore, Store } from 'vuex';
 import { load } from '@tauri-apps/plugin-store';
 
+export type Theme = 'light' | 'dark';
+export type Accent = 'blue' | 'teal' | 'purple' | 'green' | 'red';
+export type SidebarMode = 'expanded' | 'compact';
+
 export interface AppSettingsState {
   start_page: string;
-  theme: 'default';
+  theme: Theme;
+  accent: Accent;
+  sidebar_mode: SidebarMode;
   sidebar_width: number;
   app_font_size: number;
   reduce_motion: boolean;
@@ -47,17 +53,8 @@ export interface AppSettingsState {
   };
 }
 
-export interface AlarmState {
-  selected_hours: string;
-  selected_minutes: string;
-  selected_seconds: string;
-  alarm_tone: string;
-  isAlarmSet: boolean;
-}
-
 export interface State {
   app_settings: AppSettingsState;
-  alarm: AlarmState;
 }
 
 export const key: InjectionKey<Store<State>> = Symbol();
@@ -78,9 +75,11 @@ async function getTauriStore() {
 const defaultState: State = {
   app_settings: {
     start_page: '/',
-    theme: 'default',
-    sidebar_width: 220,
-    app_font_size: 14,
+    theme: 'dark',
+    accent: 'blue',
+    sidebar_mode: 'expanded',
+    sidebar_width: 240,
+    app_font_size: 13,
     reduce_motion: false,
     editor: {
       line_numbers: true,
@@ -120,13 +119,6 @@ const defaultState: State = {
       left_readonly: false,
     },
   },
-  alarm: {
-    alarm_tone: 'siren',
-    selected_hours: '00',
-    selected_minutes: '00',
-    selected_seconds: '00',
-    isAlarmSet: false,
-  },
 };
 
 function mergeDeep<T>(base: T, update: any): T {
@@ -144,18 +136,6 @@ export const store = createStore<State>({
   state: localState ? mergeDeep(defaultState, localState) : defaultState,
 
   mutations: {
-    setAlarm(state, { hours = '00', minutes = '00', seconds = '00', tone = 'nuke' }) {
-      state.alarm.selected_hours = hours;
-      state.alarm.selected_minutes = minutes;
-      state.alarm.selected_seconds = seconds;
-      state.alarm.alarm_tone = tone;
-      state.alarm.isAlarmSet = true;
-    },
-
-    clearAlarm(state) {
-      state.alarm.isAlarmSet = false;
-    },
-
     setStartPage(state, { start_page }) {
       state.app_settings.start_page = start_page;
     },
@@ -179,18 +159,6 @@ export const store = createStore<State>({
       return state.app_settings.start_page;
     },
 
-    getParsedAlarmTime(state) {
-      return `${state.alarm.selected_hours}:${state.alarm.selected_minutes}:${state.alarm.selected_seconds}`;
-    },
-
-    isAlarmSet(state) {
-      return state.alarm.isAlarmSet;
-    },
-
-    getAlarmHours(state)   { return state.alarm.selected_hours; },
-    getAlarmMinutes(state) { return state.alarm.selected_minutes; },
-    getAlarmSeconds(state) { return state.alarm.selected_seconds; },
-
     getTheme(state)            { return state.app_settings.theme; },
     getAppSettings(state)      { return state.app_settings; },
     getEditorSettings(state)   { return state.app_settings.editor; },
@@ -202,28 +170,6 @@ export const store = createStore<State>({
   },
 
   actions: {
-    setAlarmFromPreset(state, { preset }) {
-      let now = new Date();
-
-      switch (preset) {
-        case '5_mins':   now = now.addMinutes(5);   break;
-        case '15_mins':  now = now.addMinutes(15);  break;
-        case '1_hour':   now = now.addHours(1);     break;
-        case '2_hours':  now = now.addHours(2);     break;
-        case '5_hours':  now = now.addHours(5);     break;
-        case '8_hours':  now = now.addHours(8);     break;
-        case '10_hours': now = now.addHours(10);    break;
-        case '12_hours': now = now.addHours(12);    break;
-      }
-
-      let parts = now.toLocaleTimeString().split(':');
-      if (parts.length != 3) return;
-
-      state.state.alarm.selected_hours   = parts[0];
-      state.state.alarm.selected_minutes = parts[1];
-      state.state.alarm.selected_seconds = parts[2];
-    },
-
     changeTheme(state, { theme }) {
       if (theme != '') {
         state.state.app_settings.theme = theme;
@@ -240,8 +186,11 @@ export const store = createStore<State>({
       const html = document.querySelector('html');
       if (html) {
         html.dataset.theme = app.theme;
+        html.dataset.accent = app.accent;
+        html.dataset.sidebarMode = app.sidebar_mode;
         html.dataset.reduceMotion = app.reduce_motion ? 'true' : 'false';
-        html.style.setProperty('--sidebar-width', `${app.sidebar_width}px`);
+        const sidebarWidth = app.sidebar_mode === 'compact' ? 48 : app.sidebar_width;
+        html.style.setProperty('--sidebar-width', `${sidebarWidth}px`);
         html.style.setProperty('--app-font-size', `${app.app_font_size}px`);
         html.style.setProperty('--editor-font-size', `${app.editor.font_size}px`);
       }

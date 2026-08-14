@@ -70,12 +70,12 @@ const isSelected = computed(() => props.selectedPath === props.node.displayPath)
   border-radius: 6px;
 }
 .file-node:hover { background: rgba(255, 255, 255, 0.04); color: var(--text-primary); }
-.file-node.selected { background: var(--primary-subtle); color: var(--primary); }
+.file-node.selected { background: var(--accent-subtle); color: var(--accent); }
 .node-caret, .node-label {
   background: transparent;
   border: none;
   color: inherit;
-  cursor: pointer;
+  cursor: default;
 }
 .node-caret { width: 18px; display: inline-flex; align-items: center; justify-content: center; }
 .node-caret-spacer { width: 18px; display: inline-flex; }

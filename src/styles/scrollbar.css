@@ -1,0 +1,49 @@
+/* WinUI overlay scrollbar — hover-only, thin, no chrome buttons */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: transparent;
+  border: 4px solid transparent;
+  background-clip: padding-box;
+  border-radius: 8px;
+  min-height: 24px;
+  min-width: 24px;
+  transition: background var(--motion-fast) var(--ease-standard);
+}
+
+*:hover::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+  background-clip: padding-box;
+  border-width: 2px;
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background: var(--text-primary);
+  background-clip: padding-box;
+  border-width: 2px;
+}
+
+*::-webkit-scrollbar-button,
+*::-webkit-scrollbar-corner {
+  display: none;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}

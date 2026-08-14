@@ -335,29 +335,29 @@ function highlightMatches(text: string, re: RegExp) {
   padding: 0 16px; height: 44px; border-bottom: 1px solid var(--border);
   flex-shrink: 0; background: transparent;
 }
-.regex-slash { font-size: 18px; color: var(--primary); font-weight: 300; line-height: 1; }
+.regex-slash { font-size: 18px; color: var(--accent); font-weight: 300; line-height: 1; }
 .regex-pattern {
   flex: 1; background: transparent; border: none; outline: none;
   color: var(--text-primary); font-family: 'Cascadia Code', Consolas, monospace;
   font-size: 14px; user-select: text;
 }
-.regex-pattern::placeholder { color: var(--text-muted); }
+.regex-pattern::placeholder { color: var(--text-tertiary); }
 .regex-flags { display: flex; gap: 3px; }
 .flag-btn {
   width: 24px; height: 22px; border-radius: 4px; border: 1px solid var(--border);
-  background: transparent; color: var(--text-muted); font-size: 12px;
-  font-family: 'Cascadia Code', monospace; cursor: pointer; transition: all 0.12s;
+  background: transparent; color: var(--text-tertiary); font-size: 12px;
+  font-family: 'Cascadia Code', monospace; cursor: default; transition: all 0.12s;
   display: flex; align-items: center; justify-content: center;
 }
-.flag-btn:hover  { border-color: var(--primary); color: var(--primary); }
-.flag-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+.flag-btn:hover  { border-color: var(--accent); color: var(--accent); }
+.flag-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 .regex-error       { font-size: 12px; color: var(--danger); font-family: monospace; }
 .regex-match-count { font-size: 12px; color: var(--success); }
 
 .regex-input-wrap { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 .tool-pane-label {
   font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
-  color: var(--text-muted); padding: 6px 16px; border-bottom: 1px solid var(--border);
+  color: var(--text-tertiary); padding: 6px 16px; border-bottom: 1px solid var(--border);
   flex-shrink: 0; background: transparent;
   display: flex; align-items: center; justify-content: space-between;
 }
@@ -373,7 +373,7 @@ function highlightMatches(text: string, re: RegExp) {
   color: transparent; pointer-events: none; z-index: 0;
 }
 .regex-highlights :deep(.hl) {
-  background: rgba(99, 102, 241, 0.35);
+  background: var(--accent-subtle);
   border-radius: 2px;
   color: transparent;
 }
@@ -381,19 +381,19 @@ function highlightMatches(text: string, re: RegExp) {
   background: transparent; border: none; outline: none; resize: none;
   color: var(--text-primary); z-index: 1; user-select: text;
 }
-.regex-textarea::placeholder { color: var(--text-muted); }
+.regex-textarea::placeholder { color: var(--text-tertiary); }
 
 .regex-matches { flex: 0 0 auto; max-height: 200px; overflow-y: auto; }
-.regex-empty { padding: 20px 16px; font-size: 13px; color: var(--text-muted); }
+.regex-empty { padding: 20px 16px; font-size: 13px; color: var(--text-tertiary); }
 .match-row {
   display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
   padding: 5px 16px; border-bottom: 1px solid rgba(50,58,88,0.3);
   font-family: 'Cascadia Code', Consolas, monospace; font-size: 12px;
 }
 .match-row:hover { background: var(--bg-elevated); }
-.match-index { color: var(--text-muted); min-width: 24px; }
-.match-value { color: var(--primary); font-weight: 600; user-select: text; }
-.match-pos   { color: var(--text-muted); font-size: 11px; }
+.match-index { color: var(--text-tertiary); min-width: 24px; }
+.match-value { color: var(--accent); font-weight: 600; user-select: text; }
+.match-pos   { color: var(--text-tertiary); font-size: 11px; }
 .match-groups { color: var(--accent); font-size: 11px; user-select: text; }
 
 .tool-icon-btn { height: 22px; padding-left: 10px; padding-right: 10px; }
@@ -405,7 +405,7 @@ function highlightMatches(text: string, re: RegExp) {
   height: 22px;
   padding: 0 10px;
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 .tool-copy-text:hover { color: var(--text-primary); background: var(--bg-elevated); }
 
@@ -428,7 +428,7 @@ function highlightMatches(text: string, re: RegExp) {
   color: var(--text-secondary);
   font-size: 12px;
   outline: none;
-  cursor: pointer;
+  cursor: default;
 }
 .preset-input {
   padding: 5px 10px;
@@ -444,7 +444,7 @@ function highlightMatches(text: string, re: RegExp) {
   height: 24px;
   padding: 0 10px;
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 .preset-btn:hover { color: var(--text-primary); background: var(--bg-elevated); }
 .preset-btn.danger { color: var(--danger); }

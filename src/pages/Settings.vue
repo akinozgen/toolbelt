@@ -1,582 +1,603 @@
-<template>
-  <div class="page">
-    <div class="settings-header">
-      <h1 class="page-title">Settings</h1>
-      <div class="settings-tabs">
-        <button
-          v-for="t in tabs"
-          :key="t.id"
-          :class="['settings-tab', { active: activeTab === t.id }]"
-          @click="activeTab = t.id"
-        >{{ t.label }}</button>
-      </div>
-    </div>
-
-    <div class="settings-content">
-      <div v-if="activeTab === 'general'" class="card">
-        <p class="section-title">General</p>
-        <div class="settings-grid">
-          <div class="form-group">
-            <label class="form-label">Start Page</label>
-            <select v-model="startPage" @change="changeStartPage" class="select-field">
-              <option :value="route.path" :key="route.path" v-for="route in router.getRoutes()">
-                {{ route.name?.toString() }}
-              </option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Theme</label>
-            <select v-model="theme" class="select-field">
-              <option value="default">Default</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Sidebar Width (px)</label>
-            <div class="settings-slider">
-              <input type="range" min="160" max="400" v-model.number="sidebarWidth" />
-              <span class="slider-value">{{ sidebarWidth }}px</span>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">App Font Size (px)</label>
-            <div class="settings-slider">
-              <input type="range" min="12" max="20" v-model.number="appFontSize" />
-              <span class="slider-value">{{ appFontSize }}px</span>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Reduce Motion</label>
-            <label class="toggle">
-              <input type="checkbox" v-model="reduceMotion" />
-              <span class="toggle-track"></span>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div v-if="activeTab === 'editor'" class="card">
-        <p class="section-title">Editor</p>
-        <div class="settings-grid">
-          <div class="form-group">
-            <label class="form-label">Line Numbers</label>
-            <label class="toggle">
-              <input type="checkbox" v-model="editorLineNumbers" />
-              <span class="toggle-track"></span>
-            </label>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Word Wrap</label>
-            <label class="toggle">
-              <input type="checkbox" v-model="editorWordWrap" />
-              <span class="toggle-track"></span>
-            </label>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Editor Font Size (px)</label>
-            <div class="settings-slider">
-              <input type="range" min="11" max="20" v-model.number="editorFontSize" />
-              <span class="slider-value">{{ editorFontSize }}px</span>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Tab Size</label>
-            <div class="settings-slider">
-              <input type="range" min="2" max="8" v-model.number="editorTabSize" />
-              <span class="slider-value">{{ editorTabSize }}</span>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Editor Theme</label>
-            <div class="segmented">
-              <button :class="['seg-btn', { active: editorTheme === 'default' }]" @click="editorTheme = 'default'">Default</button>
-              <button :class="['seg-btn', { active: editorTheme === 'oneDark' }]" @click="editorTheme = 'oneDark'">One Dark</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div v-if="activeTab === 'formatter'" class="card">
-        <p class="section-title">Formatter</p>
-        <div class="settings-grid">
-          <div class="form-group">
-            <label class="form-label">Print Width</label>
-            <div class="settings-slider">
-              <input type="range" min="40" max="200" v-model.number="fmtPrintWidth" />
-              <span class="slider-value">{{ fmtPrintWidth }}</span>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Tab Width</label>
-            <div class="settings-slider">
-              <input type="range" min="2" max="8" v-model.number="fmtTabWidth" />
-              <span class="slider-value">{{ fmtTabWidth }}</span>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Single Quote</label>
-            <label class="toggle">
-              <input type="checkbox" v-model="fmtSingleQuote" />
-              <span class="toggle-track"></span>
-            </label>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Trailing Comma</label>
-            <div class="segmented">
-              <button :class="['seg-btn', { active: fmtTrailingComma === 'none' }]" @click="fmtTrailingComma = 'none'">none</button>
-              <button :class="['seg-btn', { active: fmtTrailingComma === 'es5' }]" @click="fmtTrailingComma = 'es5'">es5</button>
-              <button :class="['seg-btn', { active: fmtTrailingComma === 'all' }]" @click="fmtTrailingComma = 'all'">all</button>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">XML Print Width</label>
-            <div class="settings-slider">
-              <input type="range" min="20" max="200" v-model.number="fmtXmlPrintWidth" />
-              <span class="slider-value">{{ fmtXmlPrintWidth }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div v-if="activeTab === 'encoder'" class="card">
-        <p class="section-title">Encoder</p>
-        <div class="settings-grid">
-          <div class="form-group">
-            <label class="form-label">Default Mode</label>
-            <div class="segmented">
-              <button :class="['seg-btn', { active: encDefaultMode === 'encode' }]" @click="encDefaultMode = 'encode'">encode</button>
-              <button :class="['seg-btn', { active: encDefaultMode === 'decode' }]" @click="encDefaultMode = 'decode'">decode</button>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Default Algorithm</label>
-            <div class="segmented wrap">
-              <button :class="['seg-btn', { active: encDefaultAlgorithm === 'Base64' }]" @click="encDefaultAlgorithm = 'Base64'">Base64</button>
-              <button :class="['seg-btn', { active: encDefaultAlgorithm === 'Base64url' }]" @click="encDefaultAlgorithm = 'Base64url'">Base64url</button>
-              <button :class="['seg-btn', { active: encDefaultAlgorithm === 'URL' }]" @click="encDefaultAlgorithm = 'URL'">URL</button>
-              <button :class="['seg-btn', { active: encDefaultAlgorithm === 'Hex' }]" @click="encDefaultAlgorithm = 'Hex'">Hex</button>
-              <button :class="['seg-btn', { active: encDefaultAlgorithm === 'JWT' }]" @click="encDefaultAlgorithm = 'JWT'">JWT</button>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Auto-trim Input</label>
-            <label class="toggle">
-              <input type="checkbox" v-model="encAutoTrim" />
-              <span class="toggle-track"></span>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div v-if="activeTab === 'requests'" class="card">
-        <p class="section-title">Requests</p>
-        <div class="settings-grid">
-          <div class="form-group">
-            <label class="form-label">Default Method</label>
-            <select v-model="reqDefaultMethod" class="select-field">
-              <option v-for="m in methods" :key="m">{{ m }}</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Prettify Mode</label>
-            <div class="segmented">
-              <button :class="['seg-btn', { active: reqPrettifyMode === 'auto' }]" @click="reqPrettifyMode = 'auto'">auto</button>
-              <button :class="['seg-btn', { active: reqPrettifyMode === 'json' }]" @click="reqPrettifyMode = 'json'">json</button>
-              <button :class="['seg-btn', { active: reqPrettifyMode === 'raw' }]" @click="reqPrettifyMode = 'raw'">raw</button>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Timeout (ms)</label>
-            <div class="settings-slider">
-              <input type="range" min="1000" max="600000" step="1000" v-model.number="reqTimeout" />
-              <span class="slider-value">{{ reqTimeout }}ms</span>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Redirect</label>
-            <div class="segmented">
-              <button :class="['seg-btn', { active: reqRedirect === 'follow' }]" @click="reqRedirect = 'follow'">follow</button>
-              <button :class="['seg-btn', { active: reqRedirect === 'manual' }]" @click="reqRedirect = 'manual'">manual</button>
-              <button :class="['seg-btn', { active: reqRedirect === 'error' }]" @click="reqRedirect = 'error'">error</button>
-            </div>
-          </div>
-        </div>
-        <div class="form-group mt-4">
-          <label class="form-label">Default Headers</label>
-          <div class="flex flex-col gap-2">
-            <div class="flex items-center gap-2" v-for="(h, i) in reqHeadersLocal" :key="i">
-              <input class="input-field" v-model="h.key" placeholder="Header" spellcheck="false" />
-              <input class="input-field" v-model="h.value" placeholder="Value" spellcheck="false" />
-              <button class="btn btn-ghost btn-sm" @click="removeDefaultHeader(i)">Remove</button>
-            </div>
-            <button class="btn btn-ghost btn-sm" @click="addDefaultHeader">+ Add Header</button>
-          </div>
-        </div>
-      </div>
-
-      <div v-if="activeTab === 'regex'" class="card">
-        <p class="section-title">Regex</p>
-        <div class="settings-grid">
-          <div class="form-group">
-            <label class="form-label">Default Flags</label>
-            <input class="input-field" v-model="regexDefaultFlags" placeholder="gim" spellcheck="false" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Highlight Matches</label>
-            <label class="toggle">
-              <input type="checkbox" v-model="regexHighlight" />
-              <span class="toggle-track"></span>
-            </label>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Persist Presets</label>
-            <label class="toggle">
-              <input type="checkbox" v-model="regexPersistPresets" />
-              <span class="toggle-track"></span>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div v-if="activeTab === 'diff'" class="card">
-        <p class="section-title">Diff</p>
-        <div class="settings-grid">
-          <div class="form-group">
-            <label class="form-label">Default View</label>
-            <select v-model="diffDefaultView" class="select-field">
-              <option value="side">side</option>
-              <option value="unified">unified</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Default Language</label>
-            <select v-model="diffDefaultLanguage" class="select-field">
-              <option v-for="l in diffLanguages" :key="l" :value="l">{{ l }}</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Default Context Lines</label>
-            <div class="settings-slider">
-              <input type="range" min="0" max="50" v-model.number="diffDefaultContext" />
-              <span class="slider-value">{{ diffDefaultContext }}</span>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Left Read-only</label>
-            <label class="toggle">
-              <input type="checkbox" v-model="diffLeftReadonly" />
-              <span class="toggle-track"></span>
-            </label>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { useRouter } from 'vue-router';
 import { computed, watch, ref } from 'vue';
-import { key } from '../store';
+import { key, type Accent, type SidebarMode, type Theme } from '../store';
 import { useStore } from 'vuex';
+import {
+  UiCard, UiButton, UiInput, UiSelect, UiToggle, UiSegmented, UiSlider,
+} from '../components/ui';
+import {
+  Palette, Cog, Type, Braces, Binary, SendHorizontal,
+  Diff as DiffIcon, Regex, Info, Trash2, Plus, Check,
+} from 'lucide-vue-next';
 
 const router = useRouter();
 const store = useStore(key);
 
-const startPage = computed(() => store.getters.getStartPage);
-const methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
-const diffLanguages = ['plain', 'json', 'tson', 'jsonl', 'yaml', 'html', 'css', 'js', 'ts', 'tsx', 'jsx', 'vue', 'http', 'php', 'blade', 'xml', 'md'];
-const tabs = [
-  { id: 'general', label: 'General' },
-  { id: 'editor', label: 'Editor' },
-  { id: 'formatter', label: 'Formatter' },
-  { id: 'encoder', label: 'Encoder' },
-  { id: 'requests', label: 'Requests' },
-  { id: 'regex', label: 'Regex' },
-  { id: 'diff', label: 'Diff' },
-];
-const activeTab = ref('general');
+const categories = [
+  { id: 'appearance', label: 'Appearance', icon: Palette },
+  { id: 'general',    label: 'General',    icon: Cog },
+  { id: 'editor',     label: 'Editor',     icon: Type },
+  { id: 'formatter',  label: 'Formatter',  icon: Braces },
+  { id: 'encoder',    label: 'Encoder',    icon: Binary },
+  { id: 'requests',   label: 'Requests',   icon: SendHorizontal },
+  { id: 'regex',      label: 'Regex',      icon: Regex },
+  { id: 'diff',       label: 'Diff',       icon: DiffIcon },
+  { id: 'about',      label: 'About',      icon: Info },
+] as const;
 
-function changeStartPage(e: any): void {
-  store.commit('setStartPage', { start_page: e.target.value });
+type CategoryId = typeof categories[number]['id'];
+const activeCategory = ref<CategoryId>('appearance');
+
+// ── Bound state helpers ────────────────────────────────────────────
+function bindSetting<T = unknown>(path: string) {
+  return computed<T>({
+    get: () => path.split('.').reduce((o: any, k) => o?.[k], store.state.app_settings) as T,
+    set: (v: T) => {
+      store.commit('setAppSetting', { path, value: v });
+      store.dispatch('applySettingsToDOM');
+    },
+  });
 }
 
-const theme = computed({
-  get: () => store.getters.getTheme,
-  set: (v) => store.commit('setTheme', { theme: v })
-});
-const sidebarWidth = computed({
-  get: () => store.getters.getAppSettings.sidebar_width,
-  set: (v) => store.commit('setAppSetting', { path: 'sidebar_width', value: v })
-});
-const appFontSize = computed({
-  get: () => store.getters.getAppSettings.app_font_size,
-  set: (v) => store.commit('setAppSetting', { path: 'app_font_size', value: v })
-});
-const editorFontSize = computed({
-  get: () => store.getters.getEditorSettings.font_size,
-  set: (v) => store.commit('setAppSetting', { path: 'editor.font_size', value: v })
-});
-const reduceMotion = computed({
-  get: () => store.getters.getAppSettings.reduce_motion,
-  set: (v) => store.commit('setAppSetting', { path: 'reduce_motion', value: v })
+// Appearance
+const theme        = bindSetting<Theme>('theme');
+const accent       = bindSetting<Accent>('accent');
+const sidebarMode  = bindSetting<SidebarMode>('sidebar_mode');
+const sidebarWidth = bindSetting<number>('sidebar_width');
+const appFontSize  = bindSetting<number>('app_font_size');
+const reduceMotion = bindSetting<boolean>('reduce_motion');
+
+// General
+const startPage = computed({
+  get: () => store.getters.getStartPage,
+  set: (v: string) => store.commit('setStartPage', { start_page: v }),
 });
 
-const editorLineNumbers = computed({
-  get: () => store.getters.getEditorSettings.line_numbers,
-  set: (v) => store.commit('setAppSetting', { path: 'editor.line_numbers', value: v })
-});
-const editorWordWrap = computed({
-  get: () => store.getters.getEditorSettings.word_wrap,
-  set: (v) => store.commit('setAppSetting', { path: 'editor.word_wrap', value: v })
-});
-const editorTabSize = computed({
-  get: () => store.getters.getEditorSettings.tab_size,
-  set: (v) => store.commit('setAppSetting', { path: 'editor.tab_size', value: v })
-});
-const editorTheme = computed({
-  get: () => store.getters.getEditorSettings.theme,
-  set: (v) => store.commit('setAppSetting', { path: 'editor.theme', value: v })
-});
+// Editor
+const editorLineNumbers = bindSetting<boolean>('editor.line_numbers');
+const editorWordWrap    = bindSetting<boolean>('editor.word_wrap');
+const editorFontSize    = bindSetting<number>('editor.font_size');
+const editorTabSize     = bindSetting<number>('editor.tab_size');
 
-const fmtPrintWidth = computed({
-  get: () => store.getters.getFormatterSettings.print_width,
-  set: (v) => store.commit('setAppSetting', { path: 'formatter.print_width', value: v })
-});
-const fmtTabWidth = computed({
-  get: () => store.getters.getFormatterSettings.tab_width,
-  set: (v) => store.commit('setAppSetting', { path: 'formatter.tab_width', value: v })
-});
-const fmtSingleQuote = computed({
-  get: () => store.getters.getFormatterSettings.single_quote,
-  set: (v) => store.commit('setAppSetting', { path: 'formatter.single_quote', value: v })
-});
-const fmtTrailingComma = computed({
-  get: () => store.getters.getFormatterSettings.trailing_comma,
-  set: (v) => store.commit('setAppSetting', { path: 'formatter.trailing_comma', value: v })
-});
-const fmtXmlPrintWidth = computed({
-  get: () => store.getters.getFormatterSettings.xml_print_width,
-  set: (v) => store.commit('setAppSetting', { path: 'formatter.xml_print_width', value: v })
-});
+// Formatter
+const fmtPrintWidth     = bindSetting<number>('formatter.print_width');
+const fmtTabWidth       = bindSetting<number>('formatter.tab_width');
+const fmtSingleQuote    = bindSetting<boolean>('formatter.single_quote');
+const fmtTrailingComma  = bindSetting<string>('formatter.trailing_comma');
+const fmtXmlPrintWidth  = bindSetting<number>('formatter.xml_print_width');
 
-const encDefaultMode = computed({
-  get: () => store.getters.getEncoderSettings.default_mode,
-  set: (v) => store.commit('setAppSetting', { path: 'encoder.default_mode', value: v })
-});
-const encDefaultAlgorithm = computed({
-  get: () => store.getters.getEncoderSettings.default_algorithm,
-  set: (v) => store.commit('setAppSetting', { path: 'encoder.default_algorithm', value: v })
-});
-const encAutoTrim = computed({
-  get: () => store.getters.getEncoderSettings.auto_trim,
-  set: (v) => store.commit('setAppSetting', { path: 'encoder.auto_trim', value: v })
-});
+// Encoder
+const encDefaultMode      = bindSetting<string>('encoder.default_mode');
+const encDefaultAlgorithm = bindSetting<string>('encoder.default_algorithm');
+const encAutoTrim         = bindSetting<boolean>('encoder.auto_trim');
 
-const reqDefaultMethod = computed({
-  get: () => store.getters.getRequestsSettings.default_method,
-  set: (v) => store.commit('setAppSetting', { path: 'requests.default_method', value: v })
-});
-const reqPrettifyMode = computed({
-  get: () => store.getters.getRequestsSettings.prettify_mode,
-  set: (v) => store.commit('setAppSetting', { path: 'requests.prettify_mode', value: v })
-});
-const reqTimeout = computed({
-  get: () => store.getters.getRequestsSettings.timeout_ms,
-  set: (v) => store.commit('setAppSetting', { path: 'requests.timeout_ms', value: v })
-});
-const reqRedirect = computed({
-  get: () => store.getters.getRequestsSettings.redirect,
-  set: (v) => store.commit('setAppSetting', { path: 'requests.redirect', value: v })
-});
+// Requests
+const reqDefaultMethod = bindSetting<string>('requests.default_method');
+const reqPrettifyMode  = bindSetting<string>('requests.prettify_mode');
+const reqTimeout       = bindSetting<number>('requests.timeout_ms');
+const reqRedirect      = bindSetting<string>('requests.redirect');
 const reqDefaultHeaders = computed(() => store.getters.getRequestsSettings.default_headers);
 const reqHeadersLocal = ref(reqDefaultHeaders.value.map((h: any) => ({ ...h })));
-
-function addDefaultHeader() {
-  reqHeadersLocal.value = [...reqHeadersLocal.value, { key: '', value: '' }];
-}
+function addDefaultHeader()    { reqHeadersLocal.value = [...reqHeadersLocal.value, { key: '', value: '' }]; }
 function removeDefaultHeader(i: number) {
   reqHeadersLocal.value = reqHeadersLocal.value.filter((_, idx) => idx !== i);
 }
-
-const regexDefaultFlags = computed({
-  get: () => store.getters.getRegexSettings.default_flags,
-  set: (v) => store.commit('setAppSetting', { path: 'regex.default_flags', value: v })
-});
-const regexHighlight = computed({
-  get: () => store.getters.getRegexSettings.highlight_matches,
-  set: (v) => store.commit('setAppSetting', { path: 'regex.highlight_matches', value: v })
-});
-const regexPersistPresets = computed({
-  get: () => store.getters.getRegexSettings.persist_presets,
-  set: (v) => store.commit('setAppSetting', { path: 'regex.persist_presets', value: v })
-});
-
-const diffDefaultView = computed({
-  get: () => store.getters.getDiffSettings.default_view,
-  set: (v) => store.commit('setAppSetting', { path: 'diff.default_view', value: v })
-});
-const diffDefaultLanguage = computed({
-  get: () => store.getters.getDiffSettings.default_language,
-  set: (v) => store.commit('setAppSetting', { path: 'diff.default_language', value: v })
-});
-const diffDefaultContext = computed({
-  get: () => store.getters.getDiffSettings.default_context,
-  set: (v) => store.commit('setAppSetting', { path: 'diff.default_context', value: v })
-});
-const diffLeftReadonly = computed({
-  get: () => store.getters.getDiffSettings.left_readonly,
-  set: (v) => store.commit('setAppSetting', { path: 'diff.left_readonly', value: v })
-});
-
 watch(reqHeadersLocal, (next) => {
   store.commit('setAppSetting', { path: 'requests.default_headers', value: next });
 }, { deep: true });
-
 watch(reqDefaultHeaders, (next) => {
   reqHeadersLocal.value = next.map((h: any) => ({ ...h }));
 }, { deep: true });
+
+// Regex
+const regexDefaultFlags    = bindSetting<string>('regex.default_flags');
+const regexHighlight       = bindSetting<boolean>('regex.highlight_matches');
+const regexPersistPresets  = bindSetting<boolean>('regex.persist_presets');
+
+// Diff
+const diffDefaultView    = bindSetting<string>('diff.default_view');
+const diffDefaultLanguage= bindSetting<string>('diff.default_language');
+const diffDefaultContext = bindSetting<number>('diff.default_context');
+const diffLeftReadonly   = bindSetting<boolean>('diff.left_readonly');
+
+// Option lists
+const themeOptions = [
+  { label: 'Dark',  value: 'dark' },
+  { label: 'Light', value: 'light' },
+];
+const accentSwatches: { value: Accent; color: string; label: string }[] = [
+  { value: 'blue',   color: '#0078D4', label: 'Blue' },
+  { value: 'teal',   color: '#00B7C3', label: 'Teal' },
+  { value: 'purple', color: '#8B5CF6', label: 'Purple' },
+  { value: 'green',  color: '#107C10', label: 'Green' },
+  { value: 'red',    color: '#C42B1C', label: 'Red' },
+];
+const sidebarModeOptions = [
+  { label: 'Expanded', value: 'expanded' },
+  { label: 'Compact',  value: 'compact' },
+];
+const startPageOptions = computed(() =>
+  router.getRoutes()
+    .filter((r) => r.name && !r.path.includes(':'))
+    .map((r) => ({ label: String(r.name), value: r.path })),
+);
+const trailingCommaOptions = [
+  { label: 'none', value: 'none' },
+  { label: 'es5',  value: 'es5' },
+  { label: 'all',  value: 'all' },
+];
+const encModeOptions = [
+  { label: 'Encode', value: 'encode' },
+  { label: 'Decode', value: 'decode' },
+];
+const encAlgoOptions = [
+  { label: 'Base64', value: 'Base64' },
+  { label: 'Base64url', value: 'Base64url' },
+  { label: 'URL', value: 'URL' },
+  { label: 'Hex', value: 'Hex' },
+  { label: 'JWT', value: 'JWT' },
+];
+const methodOptions = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'].map(
+  (m) => ({ label: m, value: m }),
+);
+const prettifyOptions = [
+  { label: 'Auto', value: 'auto' },
+  { label: 'JSON', value: 'json' },
+  { label: 'Raw',  value: 'raw' },
+];
+const redirectOptions = [
+  { label: 'Follow', value: 'follow' },
+  { label: 'Manual', value: 'manual' },
+  { label: 'Error',  value: 'error' },
+];
+const diffViewOptions = [
+  { label: 'Side-by-side', value: 'side' },
+  { label: 'Unified',      value: 'unified' },
+];
+const diffLanguageOptions = [
+  'plain', 'json', 'tson', 'jsonl', 'yaml', 'html', 'css', 'js', 'ts', 'tsx',
+  'jsx', 'vue', 'http', 'php', 'blade', 'xml', 'md',
+].map((l) => ({ label: l, value: l }));
+
+// About metadata — pulled from package.json at build time via Vite import
+import pkg from '../../package.json';
+const appVersion = pkg.version as string;
+const appAuthor  = pkg.author as string;
+const appLicense = pkg.license as string;
+const repoUrl    = 'https://github.com/akinozgen/toolbelt';
 </script>
 
+<template>
+  <div class="settings-page">
+    <!-- Sidebar: categories -->
+    <aside class="settings-sidebar">
+      <div class="settings-sidebar-title">Settings</div>
+      <button
+        v-for="cat in categories"
+        :key="cat.id"
+        type="button"
+        :class="['settings-cat', { active: activeCategory === cat.id }]"
+        @click="activeCategory = cat.id"
+      >
+        <component :is="cat.icon" :size="16" class="settings-cat-icon" />
+        <span>{{ cat.label }}</span>
+      </button>
+    </aside>
+
+    <!-- Pane: cards for active category -->
+    <main class="settings-pane">
+      <h1 class="settings-pane-title">{{ categories.find((c) => c.id === activeCategory)?.label }}</h1>
+
+      <template v-if="activeCategory === 'appearance'">
+        <UiCard title="Theme" description="Choose between light and dark surfaces.">
+          <UiSegmented v-model="theme" :options="themeOptions" />
+        </UiCard>
+
+        <UiCard title="Accent color" description="App-wide highlight color.">
+          <div class="accent-row">
+            <button
+              v-for="a in accentSwatches"
+              :key="a.value"
+              type="button"
+              class="accent-swatch"
+              :class="{ active: accent === a.value }"
+              :style="{ '--swatch': a.color }"
+              :title="a.label"
+              @click="accent = a.value"
+            >
+              <Check v-if="accent === a.value" :size="14" />
+            </button>
+          </div>
+        </UiCard>
+
+        <UiCard title="Sidebar" description="Navigation panel display mode and width.">
+          <div class="setting-row">
+            <UiSegmented v-model="sidebarMode" :options="sidebarModeOptions" />
+          </div>
+          <div class="setting-row" v-if="sidebarMode === 'expanded'">
+            <label class="setting-label">Width</label>
+            <div class="setting-slider">
+              <UiSlider v-model="sidebarWidth" :min="180" :max="360" />
+              <span class="setting-value">{{ sidebarWidth }}px</span>
+            </div>
+          </div>
+        </UiCard>
+
+        <UiCard title="App font size">
+          <div class="setting-slider">
+            <UiSlider v-model="appFontSize" :min="11" :max="18" />
+            <span class="setting-value">{{ appFontSize }}px</span>
+          </div>
+        </UiCard>
+
+        <UiCard title="Reduce motion" description="Disable transitions and page animations.">
+          <template #action>
+            <UiToggle v-model="reduceMotion" />
+          </template>
+        </UiCard>
+      </template>
+
+      <template v-else-if="activeCategory === 'general'">
+        <UiCard title="Start page" description="Page shown when the app launches.">
+          <UiSelect v-model="startPage" :options="startPageOptions" />
+        </UiCard>
+      </template>
+
+      <template v-else-if="activeCategory === 'editor'">
+        <UiCard title="Line numbers">
+          <template #action><UiToggle v-model="editorLineNumbers" /></template>
+        </UiCard>
+        <UiCard title="Word wrap">
+          <template #action><UiToggle v-model="editorWordWrap" /></template>
+        </UiCard>
+        <UiCard title="Font size">
+          <div class="setting-slider">
+            <UiSlider v-model="editorFontSize" :min="11" :max="20" />
+            <span class="setting-value">{{ editorFontSize }}px</span>
+          </div>
+        </UiCard>
+        <UiCard title="Tab size">
+          <div class="setting-slider">
+            <UiSlider v-model="editorTabSize" :min="2" :max="8" />
+            <span class="setting-value">{{ editorTabSize }}</span>
+          </div>
+        </UiCard>
+      </template>
+
+      <template v-else-if="activeCategory === 'formatter'">
+        <UiCard title="Print width">
+          <div class="setting-slider">
+            <UiSlider v-model="fmtPrintWidth" :min="40" :max="200" />
+            <span class="setting-value">{{ fmtPrintWidth }}</span>
+          </div>
+        </UiCard>
+        <UiCard title="Tab width">
+          <div class="setting-slider">
+            <UiSlider v-model="fmtTabWidth" :min="2" :max="8" />
+            <span class="setting-value">{{ fmtTabWidth }}</span>
+          </div>
+        </UiCard>
+        <UiCard title="Single quotes">
+          <template #action><UiToggle v-model="fmtSingleQuote" /></template>
+        </UiCard>
+        <UiCard title="Trailing comma">
+          <UiSegmented v-model="fmtTrailingComma" :options="trailingCommaOptions" />
+        </UiCard>
+        <UiCard title="XML print width">
+          <div class="setting-slider">
+            <UiSlider v-model="fmtXmlPrintWidth" :min="20" :max="200" />
+            <span class="setting-value">{{ fmtXmlPrintWidth }}</span>
+          </div>
+        </UiCard>
+      </template>
+
+      <template v-else-if="activeCategory === 'encoder'">
+        <UiCard title="Default mode">
+          <UiSegmented v-model="encDefaultMode" :options="encModeOptions" />
+        </UiCard>
+        <UiCard title="Default algorithm">
+          <UiSegmented v-model="encDefaultAlgorithm" :options="encAlgoOptions" />
+        </UiCard>
+        <UiCard title="Auto-trim input" description="Strip leading/trailing whitespace before encode/decode.">
+          <template #action><UiToggle v-model="encAutoTrim" /></template>
+        </UiCard>
+      </template>
+
+      <template v-else-if="activeCategory === 'requests'">
+        <UiCard title="Default method">
+          <UiSelect v-model="reqDefaultMethod" :options="methodOptions" />
+        </UiCard>
+        <UiCard title="Prettify response">
+          <UiSegmented v-model="reqPrettifyMode" :options="prettifyOptions" />
+        </UiCard>
+        <UiCard title="Timeout">
+          <div class="setting-slider">
+            <UiSlider v-model="reqTimeout" :min="1000" :max="600000" :step="1000" />
+            <span class="setting-value">{{ Math.round(reqTimeout / 1000) }}s</span>
+          </div>
+        </UiCard>
+        <UiCard title="Redirect policy">
+          <UiSegmented v-model="reqRedirect" :options="redirectOptions" />
+        </UiCard>
+        <UiCard title="Default headers" description="Headers applied to every new request.">
+          <div class="header-list">
+            <div v-for="(h, i) in reqHeadersLocal" :key="i" class="header-row">
+              <UiInput v-model="h.key"   placeholder="Header" />
+              <UiInput v-model="h.value" placeholder="Value" />
+              <UiButton variant="subtle" iconOnly size="md" @click="removeDefaultHeader(i)">
+                <template #icon><Trash2 :size="14" /></template>
+              </UiButton>
+            </div>
+            <UiButton variant="subtle" size="sm" @click="addDefaultHeader">
+              <template #icon><Plus :size="14" /></template>
+              Add header
+            </UiButton>
+          </div>
+        </UiCard>
+      </template>
+
+      <template v-else-if="activeCategory === 'regex'">
+        <UiCard title="Default flags">
+          <UiInput v-model="regexDefaultFlags" placeholder="gim" monospace />
+        </UiCard>
+        <UiCard title="Highlight matches" description="Render match overlays in the test string area.">
+          <template #action><UiToggle v-model="regexHighlight" /></template>
+        </UiCard>
+        <UiCard title="Persist presets" description="Save custom presets across sessions.">
+          <template #action><UiToggle v-model="regexPersistPresets" /></template>
+        </UiCard>
+      </template>
+
+      <template v-else-if="activeCategory === 'diff'">
+        <UiCard title="Default view">
+          <UiSegmented v-model="diffDefaultView" :options="diffViewOptions" />
+        </UiCard>
+        <UiCard title="Default language">
+          <UiSelect v-model="diffDefaultLanguage" :options="diffLanguageOptions" />
+        </UiCard>
+        <UiCard title="Default context lines">
+          <div class="setting-slider">
+            <UiSlider v-model="diffDefaultContext" :min="0" :max="50" />
+            <span class="setting-value">{{ diffDefaultContext }}</span>
+          </div>
+        </UiCard>
+        <UiCard title="Left side read-only">
+          <template #action><UiToggle v-model="diffLeftReadonly" /></template>
+        </UiCard>
+      </template>
+
+      <template v-else-if="activeCategory === 'about'">
+        <UiCard padding="lg">
+          <div class="about-head">
+            <div class="about-app">
+              <div class="about-name">Toolbelt</div>
+              <div class="about-version">Version {{ appVersion }}</div>
+            </div>
+          </div>
+          <p class="about-tagline">A small set of utilities for everyday developer work.</p>
+          <dl class="about-meta">
+            <div class="about-meta-row">
+              <dt>Author</dt>
+              <dd>{{ appAuthor }}</dd>
+            </div>
+            <div class="about-meta-row">
+              <dt>License</dt>
+              <dd>{{ appLicense }}</dd>
+            </div>
+            <div class="about-meta-row">
+              <dt>Source</dt>
+              <dd>
+                <a :href="repoUrl" target="_blank" rel="noopener" class="about-link">
+                  github.com/akinozgen/toolbelt
+                </a>
+              </dd>
+            </div>
+          </dl>
+        </UiCard>
+      </template>
+    </main>
+  </div>
+</template>
+
 <style scoped>
-.settings-header {
+.settings-page {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-.settings-tabs {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-.settings-tab {
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.02);
-  color: var(--text-secondary);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.12s;
-}
-.settings-tab:hover {
-  color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.06);
-}
-.settings-tab.active {
-  color: var(--primary);
-  background: rgba(99, 102, 241, 0.18);
-  border-color: rgba(99, 102, 241, 0.6);
-  box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.25);
-}
-.settings-content {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-  .settings-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
-  }
-@media (max-width: 900px) {
-  .settings-grid { grid-template-columns: 1fr; }
-}
-.toggle {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  width: 44px;
-  height: 24px;
-}
-.toggle input {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-.toggle-track {
-  width: 100%;
   height: 100%;
-  border-radius: 999px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  transition: all 0.15s;
-  position: relative;
+  background: transparent;
 }
-.toggle-track::after {
+
+.settings-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  padding: var(--space-4) var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+}
+
+.settings-sidebar-title {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0 var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.settings-cat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-3);
+  height: var(--row-height);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-size: var(--fs-body);
+  font-family: inherit;
+  cursor: default;
+  text-align: left;
+  position: relative;
+  transition: background var(--motion-fast) var(--ease-standard),
+              color var(--motion-fast) var(--ease-standard);
+}
+.settings-cat:hover  { background: var(--bg-hover); color: var(--text-primary); }
+.settings-cat:active { background: var(--bg-pressed); }
+.settings-cat.active {
+  background: var(--bg-selected);
+  color: var(--text-primary);
+}
+.settings-cat.active::before {
   content: '';
   position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--text-secondary);
-  transition: all 0.15s;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 16px;
+  background: var(--accent);
+  border-radius: 0 2px 2px 0;
 }
-.toggle input:checked + .toggle-track {
-  background: var(--primary-subtle);
-  border-color: var(--primary);
-}
-.toggle input:checked + .toggle-track::after {
-  transform: translateX(20px);
-  background: var(--primary);
+.settings-cat-icon {
+  flex-shrink: 0;
+  color: currentColor;
 }
 
-.settings-slider {
+.settings-pane {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-6) var(--space-8);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.settings-pane-title {
+  font-size: var(--fs-title-lg);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  margin: 0 0 var(--space-3) 0;
+}
+
+.setting-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
 }
-.settings-slider input[type='range'] {
-  flex: 1;
-  accent-color: var(--primary);
-}
-.slider-value {
-  min-width: 64px;
-  text-align: right;
-  font-size: 12px;
+.setting-row:first-child { margin-top: 0; }
+.setting-label {
+  font-size: var(--fs-caption);
   color: var(--text-secondary);
-  font-family: 'Cascadia Code', Consolas, monospace;
+  min-width: 60px;
 }
 
-.segmented {
+.setting-slider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex: 1;
+}
+.setting-value {
+  font-family: var(--font-mono);
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  min-width: 56px;
+  text-align: right;
+}
+
+.accent-row {
+  display: flex;
+  gap: var(--space-3);
+}
+.accent-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--swatch);
+  border: 2px solid transparent;
+  cursor: default;
   display: inline-flex;
-  gap: 4px;
-  padding: 3px;
-  border-radius: 10px;
-  background: rgba(12, 15, 24, 0.4);
-  border: 1px solid var(--border);
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  transition: transform var(--motion-fast) var(--ease-standard);
 }
-.segmented.wrap { flex-wrap: wrap; }
-.seg-btn {
-  padding: 5px 10px;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--text-muted);
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.12s;
-}
-.seg-btn:hover {
-  color: var(--text-primary);
-  background: var(--bg-elevated);
-}
-.seg-btn.active {
-  color: var(--primary);
-  background: var(--primary-subtle);
-  border-color: var(--primary);
+.accent-swatch:hover  { transform: scale(1.1); }
+.accent-swatch:active { transform: scale(0.95); }
+.accent-swatch.active {
+  border-color: var(--text-primary);
 }
 
-.card {
-  background: transparent;
-  border: 1px solid var(--border);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+.header-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
 }
+.header-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.about-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+.about-app { display: flex; align-items: baseline; gap: var(--space-3); }
+.about-name {
+  font-size: var(--fs-title-lg);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+}
+.about-version {
+  font-family: var(--font-mono);
+  font-size: var(--fs-caption);
+  color: var(--text-tertiary);
+}
+.about-tagline {
+  font-size: var(--fs-body);
+  color: var(--text-secondary);
+  line-height: var(--lh-relaxed);
+  margin: 0 0 var(--space-5) 0;
+}
+.about-meta {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.about-meta-row {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+.about-meta-row dt {
+  font-size: var(--fs-caption);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.about-meta-row dd {
+  margin: 0;
+  font-size: var(--fs-body);
+  color: var(--text-primary);
+}
+.about-link {
+  color: var(--accent);
+  text-decoration: none;
+  cursor: pointer;
+}
+.about-link:hover { text-decoration: underline; }
 </style>

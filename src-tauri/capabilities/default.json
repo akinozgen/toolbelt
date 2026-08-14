@@ -23,6 +23,7 @@
     "fs:allow-stat",
     "fs:scope-home-recursive",
     "os:default",
-    "store:default"
+    "store:default",
+    "dialog:default"
   ]
 }

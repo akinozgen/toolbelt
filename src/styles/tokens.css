@@ -1,0 +1,221 @@
+/* ─────────────────────────────────────────────────────────────────────
+ * Toolbelt Design Tokens — WinUI 3 / Fluent
+ *
+ * Surfaces are flat (one Mica layer + 1px hairline borders).
+ * Theme: data-theme="dark" | "light"
+ * Accent: data-accent="blue" | "teal" | "purple" | "green" | "red"
+ * ─────────────────────────────────────────────────────────────────── */
+
+/* ── Dark (default) ─────────────────────────────────────────────── */
+:root,
+[data-theme='dark'] {
+  --bg-base:       #1B1B1B;            /* window/content base, sits on Mica */
+  --bg-surface:    #262626;            /* sidebar, topbars, panel headers */
+  --bg-elevated:   #2E2E2E;            /* inputs, cards, focused panels */
+  --bg-hover:      rgba(255,255,255,0.07);
+  --bg-pressed:    rgba(255,255,255,0.12);
+  --bg-selected:   rgba(255,255,255,0.05);
+  --bg-overlay:    rgba(0,0,0,0.45);
+
+  --border-subtle: rgba(255,255,255,0.12);  /* visible separators */
+  --border-strong: rgba(255,255,255,0.20);  /* control borders */
+
+  --text-primary:   #FFFFFF;
+  --text-secondary: #C7C7C7;
+  --text-tertiary:  #8B8B8B;
+  --text-disabled:  #5C5C5C;
+  --text-on-accent: #FFFFFF;
+
+  --danger:        #FF6B6B;
+  --danger-bg:     rgba(255,107,107,0.12);
+  --warning:       #FFC83D;
+  --warning-bg:    rgba(255,200,61,0.12);
+  --success:       #6CCB5F;
+  --success-bg:    rgba(108,203,95,0.12);
+
+  --shadow-flyout: 0 8px 16px rgba(0,0,0,0.40);
+  --shadow-tooltip: 0 4px 8px rgba(0,0,0,0.30);
+}
+
+/* ── Light ──────────────────────────────────────────────────────── */
+[data-theme='light'] {
+  --bg-base:       #ECECEC;
+  --bg-surface:    #F5F5F5;
+  --bg-elevated:   #FFFFFF;
+  --bg-hover:      rgba(0,0,0,0.05);
+  --bg-pressed:    rgba(0,0,0,0.09);
+  --bg-selected:   rgba(0,0,0,0.04);
+  --bg-overlay:    rgba(0,0,0,0.30);
+
+  --border-subtle: rgba(0,0,0,0.12);
+  --border-strong: rgba(0,0,0,0.20);
+
+  --text-primary:   #1A1A1A;
+  --text-secondary: #5C5C5C;
+  --text-tertiary:  #8B8B8B;
+  --text-disabled:  #BABABA;
+  --text-on-accent: #FFFFFF;
+
+  --danger:        #C42B1C;
+  --danger-bg:     rgba(196,43,28,0.10);
+  --warning:       #B89A02;
+  --warning-bg:    rgba(184,154,2,0.10);
+  --success:       #107C10;
+  --success-bg:    rgba(16,124,16,0.10);
+
+  --shadow-flyout: 0 8px 16px rgba(0,0,0,0.14);
+  --shadow-tooltip: 0 4px 8px rgba(0,0,0,0.10);
+}
+
+/* ── Accent presets ─────────────────────────────────────────────── */
+:root {
+  --accent-blue:   #0078D4;
+  --accent-teal:   #00B7C3;
+  --accent-purple: #8B5CF6;
+  --accent-green:  #107C10;
+  --accent-red:    #C42B1C;
+}
+
+:root,
+[data-accent='blue'] {
+  --accent:         #0078D4;
+  --accent-hover:   #1A85DA;
+  --accent-pressed: #006CBE;
+  --accent-subtle:  rgba(0,120,212,0.14);
+  --accent-tint:    rgba(0,120,212,0.08);
+}
+[data-accent='teal'] {
+  --accent:         #00B7C3;
+  --accent-hover:   #1FBFC9;
+  --accent-pressed: #009BA6;
+  --accent-subtle:  rgba(0,183,195,0.14);
+  --accent-tint:    rgba(0,183,195,0.08);
+}
+[data-accent='purple'] {
+  --accent:         #8B5CF6;
+  --accent-hover:   #9B6DFA;
+  --accent-pressed: #7748E8;
+  --accent-subtle:  rgba(139,92,246,0.14);
+  --accent-tint:    rgba(139,92,246,0.08);
+}
+[data-accent='green'] {
+  --accent:         #107C10;
+  --accent-hover:   #1F8B1F;
+  --accent-pressed: #0D680D;
+  --accent-subtle:  rgba(16,124,16,0.14);
+  --accent-tint:    rgba(16,124,16,0.08);
+}
+[data-accent='red'] {
+  --accent:         #C42B1C;
+  --accent-hover:   #D63B2C;
+  --accent-pressed: #A82316;
+  --accent-subtle:  rgba(196,43,28,0.14);
+  --accent-tint:    rgba(196,43,28,0.08);
+}
+
+/* ── Scale tokens (theme-independent) ───────────────────────────── */
+:root {
+  /* Spacing (4-base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Radius (WinUI 4-6px sweet spot) */
+  --radius-sm: 2px;
+  --radius:    4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+
+  /* Typography */
+  --font-ui:    "Segoe UI Variable", "Segoe UI", -apple-system, BlinkMacSystemFont, "SF Pro Text", Cantarell, "Adwaita Sans", system-ui, sans-serif;
+  --font-mono:  "Cascadia Code", "Cascadia Mono", "JetBrains Mono", Consolas, "SF Mono", Menlo, monospace;
+
+  --fs-caption:     11px;
+  --fs-body:        13px;
+  --fs-body-strong: 13px;
+  --fs-subtitle:    16px;
+  --fs-title:       18px;
+  --fs-title-lg:    22px;
+
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-semibold: 600;
+  --fw-bold:     700;
+
+  --lh-base:    1.4;
+  --lh-tight:   1.2;
+  --lh-relaxed: 1.6;
+
+  /* Density — Regular */
+  --row-height-sm:  24px;
+  --row-height:     30px;
+  --row-height-lg:  36px;
+  --control-height-sm: 24px;
+  --control-height:    30px;
+  --control-height-lg: 36px;
+
+  /* Motion */
+  --motion-fast:   100ms;
+  --motion-base:   150ms;
+  --motion-slow:   250ms;
+  --motion-page:   300ms;
+  --ease-standard: cubic-bezier(0.8, 0, 0.2, 1);
+  --ease-decel:    cubic-bezier(0.1, 0.9, 0.2, 1);
+  --ease-accel:    cubic-bezier(0.7, 0, 1, 0.5);
+
+  /* Z-index */
+  --z-base:     1;
+  --z-sidebar:  100;
+  --z-titlebar: 200;
+  --z-overlay:  500;
+  --z-popover:  1000;
+  --z-tooltip:  1100;
+
+  /* Shell */
+  --titlebar-height:        36px;
+  --sidebar-width-expanded: 240px;
+  --sidebar-width-compact:  48px;
+  --sidebar-width:          var(--sidebar-width-expanded); /* runtime overrides */
+
+  /* Editor */
+  --editor-font-size: 13px;
+  --app-font-size:    var(--fs-body);
+
+  /* Focus ring */
+  --focus-ring: 0 0 0 2px var(--bg-base), 0 0 0 4px var(--accent);
+}
+
+/* ── Legacy aliases (kept until pages fully migrate) ────────────── */
+:root {
+  --border:           var(--border-subtle);
+  --border-focus:     var(--accent);
+
+  --primary:          var(--accent);
+  --primary-hover:    var(--accent-hover);
+  --primary-subtle:   var(--accent-subtle);
+
+  --secondary:        var(--accent);
+  --bg-base-legacy:   var(--bg-base);
+  --bg-surface-legacy:var(--bg-surface);
+
+  --danger-hover:     var(--danger);
+  --danger-subtle:    var(--danger-bg);
+
+  --radius:           var(--radius-md); /* was 8px → now 6px (WinUI tighter) */
+}
+
+/* Reduced motion */
+html[data-reduce-motion='true'] *,
+html[data-reduce-motion='true'] *::before,
+html[data-reduce-motion='true'] *::after {
+  transition-duration: 0ms !important;
+  animation-duration:  0ms !important;
+  scroll-behavior:     auto !important;
+}

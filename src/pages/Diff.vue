@@ -43,9 +43,9 @@
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { lineNumbers, EditorView } from '@codemirror/view';
 import { EditorState } from '@codemirror/state';
-import { oneDark } from '@codemirror/theme-one-dark';
 import { Copy, Trash2 } from 'lucide-vue-next';
-import { createTwoFilesPatch } from 'diff';
+import { toolbeltCm } from '../styles/cm-theme';
+import { unifiedPatch } from '../services/diff';
 import { MergeView, unifiedMergeView } from '@codemirror/merge';
 import { json } from '@codemirror/lang-json';
 import { html } from '@codemirror/lang-html';
@@ -104,8 +104,7 @@ const languageExtension = computed(() => {
 });
 
 const baseExtensions = computed(() => {
-  const exts: any[] = [];
-  if (editorSettings.value.theme === 'oneDark') exts.push(oneDark);
+  const exts: any[] = [...toolbeltCm];
   if (editorSettings.value.line_numbers) exts.push(lineNumbers());
   if (editorSettings.value.word_wrap) exts.push(EditorView.lineWrapping);
   exts.push(EditorState.tabSize.of(editorSettings.value.tab_size));
@@ -183,15 +182,7 @@ function compare() {
 async function copyResult() {
   if (!left.value && !right.value) return;
   try {
-    const patch = createTwoFilesPatch(
-      'original.txt',
-      'modified.txt',
-      left.value,
-      right.value,
-      '',
-      '',
-      { context: contextLines.value }
-    );
+    const patch = await unifiedPatch(left.value, right.value, contextLines.value);
     await navigator.clipboard.writeText(patch);
     copied.value = true;
     if (copyTimer) clearTimeout(copyTimer);
@@ -267,17 +258,17 @@ onBeforeUnmount(() => {
 .tool-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
 .tool-pane-label {
   font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
-  color: var(--text-muted); padding: 6px 16px; border-bottom: 1px solid var(--border);
-  flex-shrink: 0; background: rgba(12, 15, 24, 0.4);
+  color: var(--text-tertiary); padding: 6px 16px; border-bottom: 1px solid var(--border);
+  flex-shrink: 0; background: var(--bg-surface);
 }
 .tool-textarea {
   flex: 1; resize: none; background: transparent; border: none; outline: none;
   color: var(--text-primary); font-family: 'Cascadia Code', Consolas, monospace;
   font-size: 13px; line-height: 1.7; padding: 16px; user-select: text;
 }
-.tool-textarea::placeholder { color: var(--text-muted); }
+.tool-textarea::placeholder { color: var(--text-tertiary); }
 .tool-resize-handle { width: 4px; flex-shrink: 0; background: var(--border); cursor: col-resize; }
-.tool-resize-handle:hover { background: var(--primary); }
+.tool-resize-handle:hover { background: var(--accent); }
 
 .merge-host {
   flex: 1;
@@ -307,7 +298,7 @@ onBeforeUnmount(() => {
   height: 22px;
   padding: 0 10px;
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -324,7 +315,7 @@ onBeforeUnmount(() => {
   color: var(--text-secondary);
   font-size: 12px;
   outline: none;
-  cursor: pointer;
+  cursor: default;
 }
 
 .tool-mode-select {
@@ -335,17 +326,17 @@ onBeforeUnmount(() => {
   color: var(--text-secondary);
   font-size: 12px;
   outline: none;
-  cursor: pointer;
+  cursor: default;
 }
 .tool-toggle {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 .tool-toggle input[type='checkbox'] {
-  accent-color: var(--primary);
+  accent-color: var(--accent);
 }
 .tool-context {
   width: 56px;

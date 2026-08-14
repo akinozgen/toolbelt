@@ -62,8 +62,8 @@ import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { lineNumbers, EditorView } from '@codemirror/view';
 import { EditorState } from '@codemirror/state';
-import { oneDark } from '@codemirror/theme-one-dark';
 import { Copy, Trash2 } from 'lucide-vue-next';
+import { toolbeltCm } from '../styles/cm-theme';
 import { json } from '@codemirror/lang-json';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
@@ -72,18 +72,10 @@ import { xml } from '@codemirror/lang-xml';
 import { yaml } from '@codemirror/lang-yaml';
 import { useStore } from 'vuex';
 import { key } from '../store';
-type PrettierFormat = (source: string, options: any) => Promise<string>;
-type PrettierPlugins = {
-  parserBabel: any;
-  parserEstree: any;
-  parserHtml: any;
-  parserPostcss: any;
-  parserTypescript: any;
-  parserXml: any;
-};
+import { format as formatService, type FormatLang } from '../services/format';
 
 const formats = ['JSON', 'HTML', 'CSS', 'JS', 'XML', 'YAML'] as const;
-type Format = typeof formats[number];
+type Format = FormatLang;
 
 const store = useStore(key);
 
@@ -98,8 +90,6 @@ const copied   = ref(false);
 const formatted = ref(false);
 let copyTimer: ReturnType<typeof setTimeout> | null = null;
 let formatTimer: ReturnType<typeof setTimeout> | null = null;
-let prettierFormat: PrettierFormat | null = null;
-let prettierPlugins: PrettierPlugins | null = null;
 
 // ── Resize state ────────────────────────────────────────────────────────
 let resizing = false;
@@ -147,8 +137,7 @@ const editorSettings = computed(() => store.getters.getEditorSettings);
 const formatterSettings = computed(() => store.getters.getFormatterSettings);
 
 const baseExtensions = computed(() => {
-  const exts: any[] = [];
-  if (editorSettings.value.theme === 'oneDark') exts.push(oneDark);
+  const exts: any[] = [...toolbeltCm];
   if (editorSettings.value.line_numbers) exts.push(lineNumbers());
   if (editorSettings.value.word_wrap) exts.push(EditorView.lineWrapping);
   exts.push(EditorState.tabSize.of(editorSettings.value.tab_size));
@@ -209,81 +198,14 @@ async function runFormat() {
   }
 }
 
-async function loadPrettier() {
-  if (prettierFormat && prettierPlugins) return;
-  const getDefault = (m: any) => m?.default ?? m;
-  const [
-    standalone,
-    babel,
-    estree,
-    html,
-    postcss,
-    typescript,
-    xml,
-  ] = await Promise.all([
-    import('prettier/standalone.mjs'),
-    import('prettier/plugins/babel.mjs'),
-    import('prettier/plugins/estree.mjs'),
-    import('prettier/plugins/html.mjs'),
-    import('prettier/plugins/postcss.mjs'),
-    import('prettier/plugins/typescript.mjs'),
-    import('@prettier/plugin-xml'),
-  ]);
-  prettierFormat = standalone.format as PrettierFormat;
-  prettierPlugins = {
-    parserBabel: getDefault(babel),
-    parserEstree: getDefault(estree),
-    parserHtml: getDefault(html),
-    parserPostcss: getDefault(postcss),
-    parserTypescript: getDefault(typescript),
-    parserXml: getDefault(xml),
-  };
-}
-
 async function doFormat(fmt: Format, src: string): Promise<string> {
-  if (!src.trim()) return '';
-  await loadPrettier();
-  if (!prettierFormat || !prettierPlugins) return src;
-  const options = {
+  return formatService(fmt, src, {
     printWidth: formatterSettings.value.print_width,
     tabWidth: formatterSettings.value.tab_width,
-    semi: true,
     singleQuote: formatterSettings.value.single_quote,
     trailingComma: formatterSettings.value.trailing_comma as 'none' | 'es5' | 'all',
-  };
-
-  if (fmt === 'JSON') {
-    return JSON.stringify(JSON.parse(src), null, 2);
-  }
-  if (fmt === 'JS') {
-    return await prettierFormat(src, { ...options, parser: 'typescript', plugins: [prettierPlugins.parserTypescript, prettierPlugins.parserEstree] });
-  }
-  if (fmt === 'HTML') {
-    return await prettierFormat(src, { ...options, parser: 'html', plugins: [prettierPlugins.parserHtml] });
-  }
-  if (fmt === 'CSS') {
-    return await prettierFormat(src, { ...options, parser: 'css', plugins: [prettierPlugins.parserPostcss] });
-  }
-  if (fmt === 'YAML') {
-    const yaml = await import('js-yaml');
-    const data = yaml.load(src);
-    return yaml.dump(data, {
-      indent: formatterSettings.value.tab_width,
-      lineWidth: formatterSettings.value.print_width,
-      noCompatMode: true,
-      sortKeys: false,
-    });
-  }
-  if (fmt === 'XML') {
-    return await prettierFormat(src, {
-      ...options,
-      printWidth: formatterSettings.value.xml_print_width,
-      xmlWhitespaceSensitivity: 'ignore',
-      parser: 'xml',
-      plugins: [prettierPlugins.parserXml],
-    });
-  }
-  return src;
+    xmlPrintWidth: formatterSettings.value.xml_print_width,
+  });
 }
 
 async function copyOutput() {
@@ -358,14 +280,14 @@ onBeforeUnmount(() => {
   border-radius: 6px;
   border: none;
   background: transparent;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   font-size: 12px;
   font-weight: 500;
-  cursor: pointer;
+  cursor: default;
   transition: all 0.12s;
 }
 .tool-tab:hover { background: var(--bg-elevated); color: var(--text-primary); }
-.tool-tab.active { background: var(--primary); color: #fff; }
+.tool-tab.active { background: var(--accent); color: #fff; }
 
 .tool-split {
   display: flex;
@@ -388,11 +310,11 @@ onBeforeUnmount(() => {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   padding: 6px 16px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
-  background: rgba(12, 15, 24, 0.4);
+  background: var(--bg-surface);
 }
 .tool-error-label {
   color: var(--danger);
@@ -416,7 +338,7 @@ onBeforeUnmount(() => {
   padding: 16px;
   user-select: text;
 }
-.tool-textarea::placeholder { color: var(--text-muted); }
+.tool-textarea::placeholder { color: var(--text-tertiary); }
 .tool-textarea-out { color: var(--text-secondary); }
 
 .tool-resize-handle {
@@ -425,7 +347,7 @@ onBeforeUnmount(() => {
   background: var(--border);
   cursor: col-resize;
 }
-.tool-resize-handle:hover { background: var(--primary); }
+.tool-resize-handle:hover { background: var(--accent); }
 .tool-icon-btn {
   height: 22px;
   padding-left: 10px;
@@ -449,7 +371,7 @@ onBeforeUnmount(() => {
   height: 22px;
   padding: 0 10px;
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 .tool-copy-text:hover {
   color: var(--text-primary);

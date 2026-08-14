@@ -4,7 +4,7 @@
     <!-- Toolbar -->
     <div class="mdpad-toolbar">
       <div class="flex items-center gap-3">
-        <span class="mdpad-title">MD Notepad</span>
+        <span class="mdpad-title">Notes</span>
         <span v-if="currentFile" class="mdpad-file-label">
           {{ currentFileName }}{{ dirty ? ' •' : '' }}
         </span>
@@ -135,8 +135,8 @@ import { ref, computed, nextTick, onMounted, onBeforeUnmount, shallowRef, watch 
 import TreeNode from '../components/TreeNode.vue';
 import { Codemirror } from 'vue-codemirror';
 import { markdown } from '@codemirror/lang-markdown';
-import { oneDark } from '@codemirror/theme-one-dark';
 import { lineNumbers, highlightActiveLine, EditorView } from '@codemirror/view';
+import { toolbeltCm } from '../styles/cm-theme';
 import { EditorState } from '@codemirror/state';
 import {
   Bold, Italic, Heading1, Code2, List, Save,
@@ -146,6 +146,7 @@ import {
 import { useStore } from 'vuex';
 import { key } from '../store';
 import { tauriFs, joinPath } from '../helpers/tauriFs';
+import { render as renderMarkdownService } from '../services/markdown';
 
 interface FileNode {
   name: string;
@@ -158,8 +159,7 @@ interface FileNode {
 const store = useStore(key);
 const editorSettings = computed(() => store.getters.getEditorSettings);
 const cmExtensions = computed(() => {
-  const exts: any[] = [markdown(), highlightActiveLine()];
-  if (editorSettings.value.theme === 'oneDark') exts.push(oneDark);
+  const exts: any[] = [markdown(), highlightActiveLine(), ...toolbeltCm];
   if (editorSettings.value.line_numbers) exts.push(lineNumbers());
   if (editorSettings.value.word_wrap) exts.push(EditorView.lineWrapping);
   exts.push(EditorState.tabSize.of(editorSettings.value.tab_size));
@@ -205,28 +205,20 @@ const currentFileName = computed(() => {
   return parts[parts.length - 1] ?? '';
 });
 
-// ── Markdown ──────────────────────────────────────────────────────────
-function renderMarkdown(text: string): string {
-  return text
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/^###### (.+)$/gm, '<h6>$1</h6>')
-    .replace(/^##### (.+)$/gm,  '<h5>$1</h5>')
-    .replace(/^#### (.+)$/gm,   '<h4>$1</h4>')
-    .replace(/^### (.+)$/gm,    '<h3>$1</h3>')
-    .replace(/^## (.+)$/gm,     '<h2>$1</h2>')
-    .replace(/^# (.+)$/gm,      '<h1>$1</h1>')
-    .replace(/^[-*_]{3,}$/gm,   '<hr>')
-    .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
-    .replace(/\*\*(.+?)\*\*/g,     '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g,         '<em>$1</em>')
-    .replace(/`(.+?)`/g,           '<code>$1</code>')
-    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>')
-    .replace(/^[-*+] (.+)$/gm,     '<li>$1</li>')
-    .replace(/^&gt; (.+)$/gm,      '<blockquote>$1</blockquote>')
-    .replace(/\n{2,}/g, '</p><p>')
-    .replace(/\n/g, '<br>');
-}
-const rendered = computed(() => renderMarkdown(content.value));
+// ── Markdown render (delegated to Rust pulldown-cmark) ────────────────
+const rendered = ref('');
+let renderTimer: ReturnType<typeof setTimeout> | null = null;
+
+watch(content, (text) => {
+  if (renderTimer) clearTimeout(renderTimer);
+  renderTimer = setTimeout(async () => {
+    try {
+      rendered.value = await renderMarkdownService(text);
+    } catch (e) {
+      console.error('markdown render error', e);
+    }
+  }, 80);
+}, { immediate: true });
 
 // ── Tree ──────────────────────────────────────────────────────────────
 async function loadTree() {
@@ -395,6 +387,7 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   if (saveTimer) clearTimeout(saveTimer);
+  if (renderTimer) clearTimeout(renderTimer);
   window.removeEventListener('keydown', onKeydown);
   window.removeEventListener('mousemove', onResizeMove);
   window.removeEventListener('mouseup', stopResize);
@@ -414,7 +407,7 @@ onBeforeUnmount(() => {
   flex-shrink: 0;
 }
 .mdpad-title    { font-size: 13px; font-weight: 600; color: var(--text-primary); }
-.mdpad-file-label { font-size: 12px; color: var(--text-muted); }
+.mdpad-file-label { font-size: 12px; color: var(--text-tertiary); }
 .mdpad-toolbar-actions { display: flex; align-items: center; gap: 2px; }
 .mdpad-sep { width: 1px; height: 18px; background: var(--border); margin: 0 6px; }
 
@@ -432,12 +425,12 @@ onBeforeUnmount(() => {
   display: flex; align-items: center; justify-content: center;
   border: none; border-radius: 5px;
   background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
+  color: var(--text-tertiary);
+  cursor: default;
   transition: all 0.12s;
 }
 .layout-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
-.layout-btn.active { background: var(--primary); color: #fff; }
+.layout-btn.active { background: var(--accent); color: #fff; }
 
 /* Split */
 .mdpad-split { display: flex; flex: 1; overflow: hidden; }
@@ -450,7 +443,7 @@ onBeforeUnmount(() => {
   cursor: col-resize;
   transition: background 0.15s;
 }
-.resize-handle:hover { background: var(--primary); }
+.resize-handle:hover { background: var(--accent); }
 
 /* Tree panel */
 .mdpad-tree-panel {
@@ -462,7 +455,7 @@ onBeforeUnmount(() => {
 }
 .mdpad-tree-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 4px 0; }
 .tree-empty {
-  padding: 24px 16px; font-size: 12px; color: var(--text-muted);
+  padding: 24px 16px; font-size: 12px; color: var(--text-tertiary);
   text-align: center; line-height: 1.7;
 }
 
@@ -471,18 +464,18 @@ onBeforeUnmount(() => {
   display: flex; align-items: center; gap: 4px;
   padding: 4px 8px; border-bottom: 1px solid var(--border);
 }
-.tree-icon-sm { font-size: 12px; flex-shrink: 0; color: var(--text-muted); }
+.tree-icon-sm { font-size: 12px; flex-shrink: 0; color: var(--text-tertiary); }
 .tree-create-input {
   flex: 1; min-width: 0;
   background: var(--bg-elevated);
-  border: 1px solid var(--primary);
+  border: 1px solid var(--accent);
   border-radius: 5px;
   color: var(--text-primary); font-size: 12px;
   padding: 3px 6px; outline: none; user-select: text;
 }
 .create-ok, .create-cancel {
   width: 20px; height: 20px; border: none; border-radius: 4px;
-  background: transparent; cursor: pointer; font-size: 11px;
+  background: transparent; cursor: default; font-size: 11px;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 .create-ok    { color: var(--success); }
@@ -495,13 +488,13 @@ onBeforeUnmount(() => {
 .mdpad-panel-label {
   display: flex; align-items: center; justify-content: space-between;
   font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
-  color: var(--text-muted); padding: 6px 12px;
+  color: var(--text-tertiary); padding: 6px 12px;
   background: transparent;
   border-bottom: 1px solid var(--border); flex-shrink: 0;
 }
 .tree-action-btn {
   width: 20px; height: 20px; border: none; border-radius: 4px;
-  background: transparent; color: var(--text-muted); cursor: pointer;
+  background: transparent; color: var(--text-tertiary); cursor: default;
   display: flex; align-items: center; justify-content: center; transition: all 0.15s;
 }
 .tree-action-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
@@ -537,12 +530,12 @@ onBeforeUnmount(() => {
 .mdpad-preview :deep(hr)     { border: none; border-top: 1px solid var(--border); margin: 1.5em 0; }
 .mdpad-preview :deep(ul)     { padding-left: 20px; list-style: disc; }
 .mdpad-preview :deep(li)     { color: var(--text-primary); margin: 4px 0; }
-.mdpad-preview :deep(a)      { color: var(--primary); text-decoration: underline; }
+.mdpad-preview :deep(a)      { color: var(--accent); text-decoration: underline; }
 .mdpad-preview :deep(strong) { color: var(--text-primary); font-weight: 600; }
 .mdpad-preview :deep(em)     { color: var(--text-secondary); }
 
 .mdpad-empty {
   flex: 1; display: flex; align-items: center; justify-content: center;
-  font-size: 13px; color: var(--text-muted);
+  font-size: 13px; color: var(--text-tertiary);
 }
 </style>

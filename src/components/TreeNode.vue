@@ -189,32 +189,32 @@ function onDrop(e: DragEvent) {
 
 .tree-row {
   display: flex; align-items: center; gap: 4px;
-  height: 28px; cursor: pointer;
+  height: 28px; cursor: default;
   border-radius: 6px; margin: 1px 4px;
   font-size: 13px; color: var(--text-secondary);
   transition: background 0.1s, color 0.1s;
 }
 .tree-row:hover    { background: var(--bg-hover); color: var(--text-primary); }
-.tree-row.selected { background: var(--primary-subtle); color: var(--primary); }
+.tree-row.selected { background: var(--accent-subtle); color: var(--accent); }
 .tree-row.drag-over {
-  background: rgba(99, 102, 241, 0.18);
-  outline: 1px solid var(--primary); outline-offset: -1px;
+  background: var(--accent-subtle);
+  outline: 1px solid var(--accent); outline-offset: -1px;
 }
 
-.tree-chevron        { color: var(--text-muted); flex-shrink: 0; }
+.tree-chevron        { color: var(--text-tertiary); flex-shrink: 0; }
 .tree-chevron-spacer { width: 12px; flex-shrink: 0; }
 
 .tree-file-icon { flex-shrink: 0; }
 .tree-file-icon.folder      { color: #f59e0b; }
 .tree-file-icon.folder-open { color: #fbbf24; }
-.tree-file-icon.file        { color: var(--text-muted); }
-.tree-row.selected .tree-file-icon { color: var(--primary); }
+.tree-file-icon.file        { color: var(--text-tertiary); }
+.tree-row.selected .tree-file-icon { color: var(--accent); }
 
 .tree-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .tree-rename-input {
   flex: 1; min-width: 0;
-  background: transparent; border: 1px solid var(--primary);
+  background: transparent; border: 1px solid var(--accent);
   border-radius: 4px; color: var(--text-primary);
   font-size: 12px; padding: 1px 4px; outline: none; user-select: text;
 }
@@ -222,18 +222,19 @@ function onDrop(e: DragEvent) {
 
 <style>
 .tree-ctx-global {
-  position: fixed; z-index: 9999;
-  background: rgba(14, 17, 28, 0.96);
-  border: 1px solid rgba(50, 58, 88, 0.8);
-  border-radius: 9px; padding: 4px; min-width: 150px;
-  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.55);
+  position: fixed; z-index: var(--z-popover);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-1);
+  min-width: 150px;
+  box-shadow: var(--shadow-flyout);
 }
 .ctx-item {
   display: flex; align-items: center; gap: 8px;
   padding: 7px 11px; border-radius: 6px;
   font-size: 12px; color: var(--text-secondary);
-  cursor: pointer; transition: background 0.1s, color 0.1s;
+  cursor: default; transition: background 0.1s, color 0.1s;
 }
 .ctx-item:hover { background: var(--bg-hover); color: var(--text-primary); }
 .ctx-item.danger { color: var(--danger); }

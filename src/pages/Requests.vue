@@ -156,11 +156,12 @@ import { ref, computed, watch } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { lineNumbers, EditorView } from '@codemirror/view';
 import { EditorState } from '@codemirror/state';
-import { oneDark } from '@codemirror/theme-one-dark';
 import { json } from '@codemirror/lang-json';
+import { toolbeltCm } from '../styles/cm-theme';
 import { Copy, Trash2 } from 'lucide-vue-next';
 import { useStore } from 'vuex';
 import { key } from '../store';
+import { send as httpSend, type HttpBody } from '../services/http';
 
 const store = useStore(key);
 const requestsSettings = computed(() => store.getters.getRequestsSettings);
@@ -209,8 +210,7 @@ const statusClass = computed(() => {
 });
 
 const baseExtensions = computed(() => {
-  const exts: any[] = [];
-  if (editorSettings.value.theme === 'oneDark') exts.push(oneDark);
+  const exts: any[] = [...toolbeltCm];
   if (editorSettings.value.line_numbers) exts.push(lineNumbers());
   if (editorSettings.value.word_wrap) exts.push(EditorView.lineWrapping);
   exts.push(EditorState.tabSize.of(editorSettings.value.tab_size));
@@ -262,64 +262,73 @@ async function send() {
   loading.value = true;
   response.value = null;
   const t0 = Date.now();
-  let timer: ReturnType<typeof setTimeout> | null = null;
   try {
-    const reqHeaders: Record<string, string> = {};
+    const reqHeaders: [string, string][] = [];
     for (const h of headers.value) {
-      if (h.key.trim()) reqHeaders[h.key.trim()] = h.value;
+      if (h.key.trim()) reqHeaders.push([h.key.trim(), h.value]);
     }
     if (authType.value === 'Bearer' && authBearer.value.trim()) {
-      reqHeaders['Authorization'] = `Bearer ${authBearer.value.trim()}`;
+      reqHeaders.push(['Authorization', `Bearer ${authBearer.value.trim()}`]);
     } else if (authType.value === 'Basic' && authBasicUser.value) {
       const token = btoa(`${authBasicUser.value}:${authBasicPass.value}`);
-      reqHeaders['Authorization'] = `Basic ${token}`;
+      reqHeaders.push(['Authorization', `Basic ${token}`]);
     } else if (authType.value === 'API Key' && authApiKeyHeader.value.trim()) {
-      reqHeaders[authApiKeyHeader.value.trim()] = authApiKeyValue.value ?? '';
+      reqHeaders.push([authApiKeyHeader.value.trim(), authApiKeyValue.value ?? '']);
     }
 
-    const opts: RequestInit = { method: method.value, headers: reqHeaders, redirect: requestsSettings.value.redirect };
+    const query: [string, string][] = params.value
+      .filter((p) => p.key.trim())
+      .map((p) => [p.key.trim(), p.value ?? '']);
+
+    let httpBody: HttpBody | undefined;
     if (!bodyDisabled.value && bodyType.value !== 'none') {
       if (bodyType.value === 'JSON' && body.value.trim()) {
-        reqHeaders['Content-Type'] = 'application/json';
-        opts.body = body.value;
+        httpBody = { kind: 'json', value: body.value };
       } else if (bodyType.value === 'raw' && body.value) {
-        opts.body = body.value;
+        httpBody = { kind: 'raw', value: body.value };
       } else if (bodyType.value === 'form-data') {
-        const fd = new FormData();
-        for (const f of formDataFields.value) {
-          if (f.key.trim()) fd.append(f.key.trim(), f.value ?? '');
-        }
-        opts.body = fd;
+        httpBody = {
+          kind: 'form',
+          fields: formDataFields.value
+            .filter((f) => f.key.trim())
+            .map((f) => [f.key.trim(), f.value ?? '']),
+        };
       }
     }
-    const controller = new AbortController();
-    const timeout = requestsSettings.value.timeout_ms;
-    timer = setTimeout(() => controller.abort(), timeout);
-    opts.signal = controller.signal;
-    const res = await fetch(buildUrlWithParams(url.value, params.value), opts);
-    const text = await res.text();
-    let formatted = text;
-    try { formatted = JSON.stringify(JSON.parse(text), null, 2); } catch {}
+
+    const res = await httpSend({
+      method: method.value,
+      url: url.value,
+      headers: reqHeaders,
+      query,
+      body: httpBody,
+      timeoutMs: requestsSettings.value.timeout_ms,
+      followRedirects: requestsSettings.value.redirect,
+    });
+
+    let formatted = res.body;
+    try { formatted = JSON.stringify(JSON.parse(res.body), null, 2); } catch {}
+
     response.value = {
       status: res.status,
       statusText: res.statusText,
-      headers: [...res.headers.entries()],
-      body: text,
+      headers: res.headers,
+      body: res.body,
       bodyFormatted: formatted,
-      time: Date.now() - t0,
+      time: res.elapsedMs,
     };
   } catch (e: any) {
+    const msg = e?.message ?? String(e);
     response.value = {
       status: 0,
       statusText: 'Network Error',
       headers: [],
-      body: e.message,
-      bodyFormatted: e.message,
+      body: msg,
+      bodyFormatted: msg,
       time: Date.now() - t0,
-      error: e?.stack ?? e?.message ?? 'Network Error',
+      error: e?.stack ?? msg,
     };
   } finally {
-    if (timer) clearTimeout(timer);
     loading.value = false;
   }
 }
@@ -352,22 +361,6 @@ function clearAll() {
   copied.value = false;
 }
 
-function buildUrlWithParams(baseUrl: string, list: { key: string; value: string }[]) {
-  try {
-    const u = new URL(baseUrl);
-    for (const p of list) {
-      if (p.key.trim()) u.searchParams.set(p.key.trim(), p.value ?? '');
-    }
-    return u.toString();
-  } catch {
-    if (!list.length) return baseUrl;
-    const query = list
-      .filter((p) => p.key.trim())
-      .map((p) => `${encodeURIComponent(p.key.trim())}=${encodeURIComponent(p.value ?? '')}`)
-      .join('&');
-    return baseUrl.includes('?') ? `${baseUrl}&${query}` : `${baseUrl}?${query}`;
-  }
-}
 </script>
 
 <style scoped>
@@ -384,8 +377,8 @@ function buildUrlWithParams(baseUrl: string, list: { key: string; value: string 
 .req-method {
   padding: 6px 10px; border-radius: var(--radius-sm);
   background: var(--bg-elevated); border: 1px solid var(--border);
-  color: var(--primary); font-size: 12px; font-weight: 600;
-  cursor: pointer; outline: none; flex-shrink: 0;
+  color: var(--accent); font-size: 12px; font-weight: 600;
+  cursor: default; outline: none; flex-shrink: 0;
 }
 .req-method option { background: var(--bg-elevated); color: var(--text-primary); }
 .req-url {
@@ -394,8 +387,8 @@ function buildUrlWithParams(baseUrl: string, list: { key: string; value: string 
   color: var(--text-primary); font-size: 13px; outline: none;
   transition: border-color 0.15s; user-select: text;
 }
-.req-url:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--primary-subtle); }
-.req-url::placeholder { color: var(--text-muted); }
+.req-url:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--accent-subtle); }
+.req-url::placeholder { color: var(--text-tertiary); }
 .req-send { flex-shrink: 0; }
 
 .req-body { display: flex; flex: 1; overflow: hidden; }
@@ -409,11 +402,11 @@ function buildUrlWithParams(baseUrl: string, list: { key: string; value: string 
 }
 .req-tab {
   padding: 3px 12px; border-radius: 5px; border: none;
-  background: transparent; color: var(--text-muted);
-  font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.12s;
+  background: transparent; color: var(--text-tertiary);
+  font-size: 12px; font-weight: 500; cursor: default; transition: all 0.12s;
 }
 .req-tab:hover { color: var(--text-primary); background: var(--bg-elevated); }
-.req-tab.active { background: var(--primary-subtle); color: var(--primary); }
+.req-tab.active { background: var(--accent-subtle); color: var(--accent); }
 .req-tabs-status { margin-left: auto; display: flex; align-items: center; gap: 10px; }
 .req-copy { margin-left: 6px; }
 
@@ -424,7 +417,7 @@ function buildUrlWithParams(baseUrl: string, list: { key: string; value: string 
 .status-ok       { background: rgba(52,211,153,0.15); color: var(--success); }
 .status-redirect { background: rgba(251,191,36,0.15); color: #fbbf24; }
 .status-error    { background: var(--danger-subtle); color: var(--danger); }
-.res-meta { font-size: 11px; color: var(--text-muted); }
+.res-meta { font-size: 11px; color: var(--text-tertiary); }
 
 .req-error-row {
   display: flex;
@@ -443,22 +436,22 @@ function buildUrlWithParams(baseUrl: string, list: { key: string; value: string 
   color: var(--text-primary); font-size: 12px; outline: none; user-select: text;
 }
 .req-kv-input:focus { border-color: var(--border-focus); }
-.req-kv-input::placeholder { color: var(--text-muted); }
+.req-kv-input::placeholder { color: var(--text-tertiary); }
 .req-kv-del {
   width: 22px; height: 22px; border: none; border-radius: 4px;
-  background: transparent; color: var(--text-muted); cursor: pointer; font-size: 11px;
+  background: transparent; color: var(--text-tertiary); cursor: default; font-size: 11px;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 .req-kv-del:hover { background: var(--danger-subtle); color: var(--danger); }
 .req-kv-add {
   margin-top: 4px; padding: 5px 12px; border-radius: var(--radius-sm);
   border: 1px dashed var(--border); background: transparent;
-  color: var(--text-muted); font-size: 12px; cursor: pointer; transition: all 0.12s;
+  color: var(--text-tertiary); font-size: 12px; cursor: default; transition: all 0.12s;
   align-self: flex-start;
 }
-.req-kv-add:hover { border-color: var(--primary); color: var(--primary); }
+.req-kv-add:hover { border-color: var(--accent); color: var(--accent); }
 .req-kv-readonly .req-kv-row { gap: 12px; }
-.req-kv-key { font-size: 12px; color: var(--text-muted); font-family: monospace; min-width: 160px; }
+.req-kv-key { font-size: 12px; color: var(--text-tertiary); font-family: monospace; min-width: 160px; }
 .req-kv-val { font-size: 12px; color: var(--text-primary); font-family: monospace; user-select: text; }
 
 .req-body-wrap { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
@@ -469,15 +462,15 @@ function buildUrlWithParams(baseUrl: string, list: { key: string; value: string 
 .req-body-type {
   padding: 3px 8px; border-radius: 5px; background: var(--bg-elevated);
   border: 1px solid var(--border); color: var(--text-secondary);
-  font-size: 12px; cursor: pointer; outline: none;
+  font-size: 12px; cursor: default; outline: none;
 }
 .req-no-body {
   flex: 1; display: flex; align-items: center; justify-content: center;
-  font-size: 13px; color: var(--text-muted);
+  font-size: 13px; color: var(--text-tertiary);
 }
 .req-empty {
   flex: 1; display: flex; align-items: center; justify-content: center;
-  font-size: 13px; color: var(--text-muted);
+  font-size: 13px; color: var(--text-tertiary);
 }
 .req-editor { flex: 1; min-height: 0; }
 :deep(.cm-editor) { height: 100%; background: transparent; }
@@ -491,7 +484,7 @@ function buildUrlWithParams(baseUrl: string, list: { key: string; value: string 
 .req-body-disabled {
   margin-left: auto;
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 .req-clear {
   color: var(--danger);
@@ -501,7 +494,7 @@ function buildUrlWithParams(baseUrl: string, list: { key: string; value: string 
   height: 22px;
   padding: 0 10px;
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 .req-copy-text:hover { color: var(--text-primary); background: var(--bg-elevated); }
 
@@ -530,7 +523,7 @@ function buildUrlWithParams(baseUrl: string, list: { key: string; value: string 
 }
 .req-prettify-label {
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 .req-prettify-select {
   padding: 2px 6px;
@@ -539,7 +532,7 @@ function buildUrlWithParams(baseUrl: string, list: { key: string; value: string 
   border: 1px solid var(--border);
   color: var(--text-secondary);
   font-size: 11px;
-  cursor: pointer;
+  cursor: default;
   outline: none;
 }
 </style>
